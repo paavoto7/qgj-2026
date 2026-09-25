@@ -30,7 +30,10 @@ Review for bugs that break the game or the project for teammates. Keep comments 
 
 ### Project conventions
 - Global managers must be autoloads, not nodes found with `get_tree().root.find_child`.
-- Scene changes must go through the scene loading autoload once one exists, not `change_scene_to_file` scattered around.
+- Scene changes and pausing must go through `MainManager`, not `change_scene_to_file` or `get_tree().paused` scattered around.
+- Music and one-shot sounds should go through `AudioManager`.
+- New save data must be `@export` variables on `GameData`, plain variables aren't saved.
+- Menus should extend `MenuBase`, state logic should use `StateMachine` + `StateBase`, and health or damage should use the `Health` / `DamageZone` components instead of new parallel versions.
 - Input must use Input Map actions (`Input.is_action_pressed`), not `Input.is_key_pressed` or raw keycodes.
 - A feature should stay in one language. Shared building blocks should be GDScript.
 - GDScript: `snake_case` files and members, `_` prefix for private members, a `##` doc comment per script.
