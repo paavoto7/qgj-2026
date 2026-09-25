@@ -15,3 +15,12 @@ export_credentials.cfg
 .mono/
 data_*/
 mono_crash.*.json
+
+# C# build output and IDE folders
+bin/
+obj/
+.vs/
+.idea/
+
+# Export builds
+builds/

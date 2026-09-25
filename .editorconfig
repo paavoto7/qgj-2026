@@ -1,6 +1,18 @@
 # Remove the line below if you want to inherit .editorconfig settings from higher directories
 root = true
 
+# All files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+
+# GDScript files, matches the Godot editor defaults
+[*.gd]
+indent_style = tab
+indent_size = 4
+trim_trailing_whitespace = true
+
 # C# files
 [*.cs]
 
@@ -12,7 +24,7 @@ indent_style = space
 tab_width = 4
 
 # New line preferences
-end_of_line = crlf
+end_of_line = lf
 insert_final_newline = true
 
 #### .NET Code Actions ####

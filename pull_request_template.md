@@ -6,14 +6,15 @@
 -
 
 ## Editor setup needed
-<!-- Anything others must do in the Unity editor after pulling, e.g. assign a reference, add a layer or tag. Write "None" if nothing. -->
+<!-- Anything others must do in the Godot editor after pulling, e.g. assign an export, add an input action, group or physics layer. Write "None" if nothing. -->
 
 ## Screenshots / video
 <!-- Optional, but very helpful for visual or gameplay changes. -->
 
 ## Checklist
-- [ ] Compiles without errors or new warnings in the Unity console
-- [ ] `.meta` files are included for all added, moved or renamed assets
-- [ ] No `Library/`, `Temp/`, `Logs/`, `UserSettings/`, `.csproj` or `.sln` files
+- [ ] Runs without errors or new warnings in the Godot output and debugger
+- [ ] C# builds without errors (if C# was changed)
+- [ ] `.uid` and `.import` files are included for all added, moved or renamed files
+- [ ] No `.godot/`, `bin/`, `obj/`, `.vs/` or export builds
 - [ ] Didn't edit a scene someone else is working on
-- [ ] Code follows `.editorconfig` (`dotnet format whitespace --folder Assets/Scripts --verify-no-changes`)
+- [ ] Code follows `.editorconfig` and the style in `CONTRIBUTING.md`
