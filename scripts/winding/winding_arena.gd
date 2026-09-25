@@ -21,6 +21,7 @@ var _enemies: Array[KnotEnemy] = []
 var _player: WindingPlayer
 var _thread: ThreadTrail
 var _hud: Label
+var _game_over: GameOverScreen
 
 
 func _ready() -> void:
@@ -41,13 +42,16 @@ func _ready() -> void:
 	_hud.position = Vector2(ARENA_MARGIN + 12.0, ARENA_MARGIN + 8.0)
 	hud_layer.add_child(_hud)
 
+	_game_over = GameOverScreen.new()
+	_game_over.hide()
+	add_child(_game_over)
+	_player.health.died.connect(_game_over.open)
+
 	_next_wave()
 
 
 func _physics_process(delta: float) -> void:
 	if _player.health.is_dead:
-		if Input.is_action_just_pressed("ui_accept"):
-			MainManager.reload_scene()
 		_update_hud()
 		return
 
@@ -169,10 +173,8 @@ func _update_hud() -> void:
 	var text: String = "Wave %d    Score %d    HP %d" % [_wave, _score, _player.health.current_health]
 	if _combo > 1:
 		text += "    x%d combo!" % _combo
-	if _player.health.is_dead:
-		text += "\nThe thread snapped. Press Enter to try again."
-	elif _wave == 1:
-		text += "\nMove with the arrow keys or stick. Wind your thread around enemies: the rings show how many loops, the arrow which way."
+	if _wave == 1:
+		text += "\nMove with WASD, the arrow keys or a stick. Wind your thread around enemies: the rings show how many loops, the arrow which way."
 	_hud.text = text
 
 
