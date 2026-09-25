@@ -24,3 +24,5 @@ obj/
 
 # Export builds
 builds/
+
+.vscode/
