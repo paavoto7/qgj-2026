@@ -174,7 +174,7 @@ func _update_hud() -> void:
 	if _combo > 1:
 		text += "    x%d combo!" % _combo
 	if _wave == 1:
-		text += "\nMove with the arrow keys or stick. Wind your thread around enemies: the rings show how many loops, the arrow which way."
+		text += "\nMove with WASD, the arrow keys or a stick. Wind your thread around enemies: the rings show how many loops, the arrow which way."
 	_hud.text = text
 
 
