@@ -1,42 +1,35 @@
 # Jam start checklist
 Only one person does this, the rest wait until the PR is merged and then pull.
 
-## 1. Create the Unity project
-1. Unity Hub > New project > Unity **6000.6.2f1** > *Universal 2D* or *Universal 3D*.
-2. Create it in a **temporary folder** outside the repo (Hub refuses non-empty folders).
-3. Close the editor.
+## 1. Create the Godot project
+1. Everyone uses the **.NET build** of Godot **4.7.2** (`Godot_v4.7.2-stable_mono_*`), so C# scripts work for everyone.
+2. Project Manager > Create:
+    - *Project Path*: the repo root. Godot warns that the folder isn't empty, that's fine.
+    - *Renderer*: *Forward+* for 3D, *Compatibility* for 2D or if we might want a web build.
+    - *Version Control Metadata*: **None**. The repo already has `.gitignore` and `.gitattributes`.
+3. Create & Edit. Check that `project.godot` and `icon.svg` appear in the repo root.
 
-## 2. Move it into the repo
-1. Copy `Packages/` and `ProjectSettings/` from the temp project to the repo root.
-2. Copy the contents of the temp project's `Assets/` into the repo's `Assets/`, e.g. `Settings/`, `Scenes/`.
-    - If the template has its own `InputSystem_Actions.inputactions`, **keep ours** (don't overwrite it, including the `.meta`).
-3. Don't copy `Library/`, `Temp/`, `Logs/`, `UserSettings/` or any `.csproj`/`.sln` files.
-4. Open the repo root in Unity Hub (Add > Add project from disk) and open it. Check the console for errors.
+## 2. Folders
+Create these in the FileSystem dock:
+- `scenes/` with `scenes/sandbox/` for personal test scenes.
+- `scripts/`, `assets/` (`sprites/`, `audio/`, `fonts/`...), `resources/`.
 
 ## 3. Project settings
-- Player > Other Settings > Active Input Handling = *Input System Package (New)*.
-- Input System Package > Project-wide Actions = `Assets/InputSystem_Actions`.
-- Editor > Asset Serialization = *Force Text* (default).
-- Window > TextMeshPro > Import TMP Essential Resources.
+- Application > Config > *Name*: the game's name.
+- Display > Window: set the *Viewport Width/Height* and *Stretch Mode* (`canvas_items` for most 2D games, `viewport` for pixel art).
+- Rendering > Textures > *Default Texture Filter* = *Nearest* for pixel art.
+- Input Map: add the basic actions, e.g. `move_left`, `move_right`, `move_up`, `move_down`, `jump`, `interact`, `pause`, with keyboard and controller bindings.
 
-## 4. Scenes and prefabs
-1. Create `Assets/Scenes/MainMenu.unity` and `Assets/Scenes/Game.unity`.
-2. Build Profiles / Build Settings order: `MainMenu` (0), `Game` (1).
-3. Create `Assets/Prefabs/MainManager.prefab` with a `MainManager` component.
-    - Optionally assign a loading screen prefab (a Canvas with `LoadingScreen` and `LoadingBar`).
-4. In `MainMenu`:
-    - Add the `MainManager` prefab.
-    - Add a GameObject with `InputManager` and one with `SoundManager` (adds an `AudioSource`).
-    - Add a Canvas with `UIManager` and a child panel with `MainMenu`. Set it as the UIManager's *Start Layer* and add it to *UI Layers*.
-    - Hook the Play button to `MainMenu.PlayGame` and Quit to `MainMenu.QuitGame`.
-    - Check that the EventSystem uses `InputSystemUIInputModule`.
-5. In `Game`:
-    - Add a Canvas with `UIManager`, a child `PauseMenu` panel (Resume and Quit buttons) and `PauseMenuController` referencing it.
-    - Add the `PauseMenu` to the UIManager's *UI Layers*. Tick *Is Overlay* on it to keep the HUD visible under it.
-    - Untick *Lock Cursor On Resume* on `PauseMenuController` if the game uses the mouse cursor.
-6. Pressing Play in `Game` directly should work too, `EditorBootstrapper` spawns the missing managers.
+## 4. C# setup
+1. Project > Tools > C# > Create C# solution. This creates `<project>.csproj` and `<project>.sln`.
+2. Press Build (hammer icon, top right) and check the output for errors.
 
-## 5. Commit
+## 5. Scenes
+1. Create `scenes/main_menu.tscn` and `scenes/game.tscn`.
+2. Project Settings > Application > Run > *Main Scene* = `scenes/main_menu.tscn`.
+3. Add global managers as autoloads in Project Settings > Globals once they exist.
+
+## 6. Commit
 1. `git checkout -b project-setup`
-2. `git status`, check that no `Library/` etc. is included.
-3. Commit, push and open a PR. Once merged, tell everyone to pull.
+2. `git status`, check that `.godot/` isn't included, and that `project.godot`, `icon.svg`, `*.import`, `*.uid`, `.csproj` and `.sln` are.
+3. Commit, push and open a PR. Once merged, tell everyone to pull and open the project with Import in the Project Manager.

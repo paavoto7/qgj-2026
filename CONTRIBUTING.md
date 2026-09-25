@@ -32,40 +32,76 @@ If problems arise, merge or rebase main to your branch. Ask for help if needed.
 1. Create a pull request for your branch
 2. Merge the branch, no reviewers mandated
 
-# Unity
-- Use the editor version in [README.md](README.md), others might break the project for everyone.
-- Always commit the `.meta` files together with their assets. Missing meta files break references.
+# Godot
+- Use the editor version in [README.md](README.md), the **.NET build**. Others might break the project for everyone.
+- Always commit the `.uid` and `.import` files together with their scripts and assets. Never commit `.godot/`.
+- Rename and move files in the Godot FileSystem dock, not in Explorer, so references get updated.
 - Never work on the same scene at the same time as someone else, scenes merge badly.
-    - Make things into prefabs and edit those instead.
-    - For testing, make your own scene in `Assets/Scenes/Sandbox/[name]`.
-- Keep Asset Serialization as *Force Text* (Project Settings > Editor).
+    - Split things into their own scenes and edit those instead.
+    - For testing, make your own scene in `scenes/sandbox/[name]/`.
+- Mention changes to Project Settings (input actions, autoloads, layers) in your PR, they all end up in `project.godot`.
+
+## Languages
+GDScript is the default. C# is fine for your own features, but keep a feature in one language and write shared code (autoloads, base classes, Resources) in GDScript.
 
 ## Code style
-Follow the existing scripts and `.editorconfig`:
+Follow `.editorconfig`.
+
+### GDScript
+Follow the [official style guide](https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/gdscript_styleguide.html):
+- Tabs for indentation.
+- Static typing everywhere.
+- `snake_case` for files, variables and functions, `PascalCase` for `class_name`. Private members start with `_`.
+- A short `##` doc comment for each script.
+
+```gdscript
+class_name Example
+extends Node3D
+## Is responsible for something.
+
+@export var speed: float = 1.0
+
+var is_moving: bool = false
+
+
+func stop() -> void:
+	is_moving = false
+
+
+func _physics_process(delta: float) -> void:
+	if is_moving:
+		translate(Vector3.FORWARD * speed * delta)
+	else:
+		pass # ...
+```
+
+### C#
 - Braces on their own line.
 - No namespaces.
-- `[SerializeField] private` fields in camelCase.
+- Script classes are `partial` and named like their file.
+- `[Export] private` fields in camelCase.
 - A short summary for each class.
 - Single-statement methods use arrow notation (`=>`).
-- Unity compiles C# 9, so don't use newer syntax such as file-scoped namespaces or collection expressions (`[]`).
 
 ```csharp
+using Godot;
+
 /// <summary>
 /// Is responsible for something.
 /// </summary>
-public class Example : MonoBehaviour
+public partial class Example : Node3D
 {
-    [SerializeField] private float speed = 1f;
+    [Export] private float speed = 1f;
 
     public bool IsMoving { get; private set; }
 
     public void Stop() => IsMoving = false;
 
-    private void Update()
+    public override void _PhysicsProcess(double delta)
     {
         if (IsMoving)
         {
-            transform.Translate(speed * Time.deltaTime * Vector3.forward);
+            Translate(Vector3.Forward * speed * (float)delta);
         }
         else
         {

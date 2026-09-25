@@ -4,72 +4,93 @@ Guidance for AI coding agents working in this repository. For people, see [READM
 `.github/copilot-instructions.md` is an exact copy of this file for Visual Studio Copilot, which doesn't read `AGENTS.md`. Whenever you edit this file, copy it over there too: `cp AGENTS.md .github/copilot-instructions.md`.
 
 ## Project
-- Unity game for Quantum Game Jam 2026, Unity **6000.6.2f1** (URP, Input System, uGUI/TextMeshPro).
-- Until jam start only `Assets/` is tracked. `ProjectSettings/` and `Packages/` get added then, see [docs/JAM_START.md](docs/JAM_START.md).
-- Starter scripts are under `Assets/Scripts/`, the README has a table of what each does.
+- Godot game for Quantum Game Jam 2026, Godot **4.7.2** (.NET build, so both GDScript and C# work).
+- The repo root is the Godot project root (`res://`). `project.godot` gets added at jam start, see [docs/JAM_START.md](docs/JAM_START.md).
+- No starter scripts exist yet. When adding shared systems, follow the architecture section below.
+
+## Languages
+**GDScript is the default.** Use C# only where it clearly helps (heavy computation, existing C# code, a teammate's preference for their own feature).
+- Keep a feature in one language. Cross-language calls work (`get_node("/root/X")` / `GetNode("/root/X")`, `call`, signals) but lose type checking.
+- Shared building blocks (autoloads, base classes, Resources) should be GDScript so both sides can use them.
+- C# requires everyone to use the **.NET build** of Godot and the .NET SDK. Godot generates `<project>.csproj` and `<project>.sln` when the first C# script is created, commit them.
+
+## GDScript constraints
+- Use static typing everywhere: `var speed: float = 1.0`, `func move(delta: float) -> void:`. Prefer `:=` only when the type is obvious from the right side.
+- Give reusable scripts a `class_name`. Don't use `class_name` on autoload scripts, it clashes with the autoload name.
+- Use `@export` for inspector values and `@onready var x: Type = $Path` (or `%UniqueName`) for node references. Don't call `get_node` in `_process`.
+- Check freed nodes with `is_instance_valid(node)`, not just `node != null`. A freed node isn't `null`.
+- Connect signals with callables: `button.pressed.connect(_on_button_pressed)`. Disconnect in `_exit_tree` if the emitter outlives the listener (autoloads, other persistent nodes).
 
 ## C# constraints
-Unity 6.6 compiles with **C# 9** (`-langversion:9.0`) against .NET Standard 2.1. Don't use newer features even if `.editorconfig` prefers them:
-- No file-scoped namespaces, collection expressions (`[]`), primary constructors, `required`/`file`, extended property patterns, UTF-8 literals, `field` keyword or `System.Threading.Lock`.
-- Target-typed `new()`, `is not`, switch expressions and static lambdas are fine.
+Godot .NET compiles against the `TargetFramework` in the generated `.csproj` (.NET 8 or newer), so modern C# is fine. Godot-specific:
+- Every script class that extends a Godot type must be `partial`, and its class name must match its file name.
+- Use `[Export]` for inspector values and `[Signal] public delegate void SomethingEventHandler(...)` for signals (the `EventHandler` suffix is required).
+- Don't use `?.`, `??` or `is null` to check if a `GodotObject` is still alive. Use `GodotObject.IsInstanceValid(obj)`.
+- Unsubscribe from C# events (`-=`) in `_ExitTree` when the emitter outlives the listener.
+- Build with `dotnet build` or the editor's Build button before running, otherwise the editor runs stale assemblies.
 
-Unity-specific:
-- Don't use `?.`, `??` or `is null` on `UnityEngine.Object` types, they skip Unity's overloaded null check. Use `!= null` / `== null`.
-- Don't make `[SerializeField]` fields `readonly` or serialized structs `readonly struct`.
-- `Assets/InputSystem_Actions.cs` is generated from `InputSystem_Actions.inputactions`. Don't edit or reformat it.
-- Always keep `.meta` files with their assets. Don't create, rename or move assets without their `.meta`.
-- A MonoBehaviour's class name must match its file name. Rename both together and keep the `.meta` with the file, otherwise every scene and prefab reference to the script breaks.
-- Renaming a serialized field (`[SerializeField]` or public) silently clears its value in every scene and prefab. Keep the old values with `[FormerlySerializedAs("oldName")]`.
-- Pausing sets `Time.timeScale = 0`. Anything that runs while paused (UI, fades, menus) must use `Time.unscaledDeltaTime` / `WaitForSecondsRealtime`, as `ScreenFade` and `UILayer` do.
+## Godot-specific rules (both languages)
+- A script's class name and file are linked. Rename or move scripts, scenes and resources **inside the Godot FileSystem dock**, so references and `.uid` files are updated. Outside the editor, always move the `.uid` / `.import` file together with its file.
+- Always commit `.uid` files (next to scripts and shaders) and `.import` files (next to imported assets like images and sounds). Never commit `.godot/`.
+- Renaming an exported property silently clears its value in every scene and resource that set it. Avoid renames after the value has been set in scenes, or tell the user to reassign the values.
+- Pausing sets `get_tree().paused = true`. Anything that runs while paused (pause menu, UI, fades) needs `process_mode = PROCESS_MODE_ALWAYS` (or `WHEN_PAUSED`). Tweens need `set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)` and timers `get_tree().create_timer(t, true)`.
+- Use `_physics_process` for movement and physics, `_process` for visuals. Multiply by `delta`.
 
-## Scenes, prefabs and assets
-- Don't hand-edit `.unity`, `.prefab` or `.asset` YAML. Write the code, then give the user editor steps (e.g. "add X to the Canvas, assign Y in the inspector"), like [docs/JAM_START.md](docs/JAM_START.md) does.
-- New input actions go in `Assets/InputSystem_Actions.inputactions`. Unity regenerates `InputSystem_Actions.cs` on import. Then expose the action as a property on `InputManager`.
+## Scenes, resources and project settings
+- Don't hand-edit `.tscn`, `.tres` or `project.godot` beyond trivial fixes. Write the code, then give the user editor steps (e.g. "add a `Timer` child to `Player`, set *One Shot* on it"), like [docs/JAM_START.md](docs/JAM_START.md) does.
+- New input actions go in Project Settings > Input Map. Give the user steps for adding them, then read them with `Input.is_action_pressed("action")` / `Input.IsActionPressed("action")`. Don't read keys or buttons directly.
+- Folder and file names in `snake_case` (`scenes/player/player.tscn`, `scripts/player.gd`), except C# files which must match their PascalCase class.
 
 ## Architecture
-Use the existing systems instead of building parallel ones:
-- `SingletonBase<T>` / `PersistentSingletonBase<T>` for managers. Check `IsInstance` after `base.Awake()` in overrides.
-- `UIManager` + `UILayer` for every screen, menu or HUD element. Override `Show(object data)`, `CanShow` or `OnClosing` as needed.
-- `InputManager.Instance.<Action>` for input, not reading devices directly.
-- `SoundManager` for music and non-world SFX, `AudioController` for per-object sounds.
-- `MainManager` for scene loading.
-- `StateMachine` + `IState` for state-based behaviour (player, enemies, game flow).
+Prefer Godot's built-in patterns over building parallel ones:
+- **Autoloads** (Project Settings > Globals) for global managers, e.g. game state, scene loading, sound. They exist in every scene, including when running a single scene with F6.
+- **Scenes** as reusable building blocks, instanced instead of copy-pasted.
+- **Signals** for communication upwards and between siblings, direct calls downwards ("call down, signal up").
+- **Resources** (`extends Resource` with `class_name`) for data such as item or enemy stats, instead of hard-coded values.
+- One scene per screen or menu under a `CanvasLayer`. Show and hide them through a single UI manager once one exists.
+- A node-based state machine (a `StateMachine` node with `State` children) for player, enemy and game flow logic.
+- Scene changes through one place (an autoload), not `get_tree().change_scene_to_file` scattered around.
 
-New persistent managers must also be spawned in `Editor/EditorBootstrapper.cs`, so pressing Play in any scene still works.
-
-Abstractions are welcome. Prefer reusable, generic building blocks, such as base classes, interfaces, ScriptableObject data and events, over one-off code, as long as they stay understandable. No tests or test frameworks for now, and ask before adding packages.
+Abstractions are welcome. Prefer reusable, generic building blocks, such as base classes, Resources, scenes and signals, over one-off code, as long as they stay understandable. No tests or test frameworks for now, and ask before adding addons, NuGet packages or other dependencies.
 
 ## Code style
-Follow `.editorconfig` (only `[*.cs]` is configured). In short:
-- Allman braces, 4 spaces, CRLF, final newline.
+Follow `.editorconfig`.
+
+GDScript follows the [official style guide](https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/gdscript_styleguide.html):
+- Tabs for indentation, LF line endings, final newline.
+- `snake_case` for variables, functions and files, `PascalCase` for `class_name` and nodes, `CONSTANT_CASE` for constants and enum values.
+- Prefix private members with `_`: `var _velocity: Vector2`, `func _update_hud() -> void:`.
+- A short `##` doc comment at the top of each script.
+- Order: `class_name`, `extends`, doc comment, signals, enums, constants, `@export`, public vars, private vars, `@onready` vars, built-in callbacks (`_ready`, `_process`...), public methods, private methods.
+
+C#:
+- Allman braces, 4 spaces, LF, final newline.
 - No namespaces.
-- `[SerializeField] private` fields in camelCase, PascalCase for properties, methods and types.
+- Private fields in camelCase, PascalCase for properties, methods and types. `[Export] private float speed = 1f;` is fine.
 - A short `/// <summary>` for each class.
-- Single-statement methods use arrow notation: `public void Stop() => audioSource.Stop();`. Multi-statement methods and constructors use block bodies.
+- Single-statement methods use arrow notation: `public void Stop() => audioPlayer.Stop();`. Multi-statement methods and constructors use block bodies.
 - `var` when the type isn't a built-in, explicit `int`, `float`, `bool` etc.
 - Short single-line `if (x) return;` statements are fine. Use braces if the statement spans lines.
 
 ## Verifying changes
-1. Formatting:
+1. C# formatting, if there is any C#:
    ```sh
-   dotnet format whitespace --folder Assets/Scripts --verify-no-changes
+   dotnet format whitespace --folder . --verify-no-changes
    ```
-   Drop `--verify-no-changes` to fix. Code inside `#if UNITY_EDITOR` (e.g. `Editor/EditorBootstrapper.cs`) is skipped by `--folder`, check it by hand.
-2. Compile with Unity, since there is no csproj or sln in the repo. Once the project exists, run batch mode on the repo root. Before that, use a throwaway project outside the repo:
-   - Copy `Assets/Scripts` and `Assets/InputSystem_Actions.*` into `<tmp>/Assets/`.
-   - Add `<tmp>/Packages/manifest.json` listing `com.unity.inputsystem`, `com.unity.ugui` and `com.unity.modules.audio`. Exact versions don't matter, Unity resolves compatible ones.
-   - Run `"C:/Program Files/Unity/Hub/Editor/6000.6.2f1/Editor/Unity.exe" -batchmode -nographics -quit -projectPath <tmp> -logFile <tmp>/unity.log`. Pass Windows-style paths (`cygpath -w` in Git Bash).
-   - Check that `<tmp>/Library/ScriptAssemblies/Assembly-CSharp.dll` was rebuilt.
-   - Grep the log for `error CS` and `warning CS`.
+   Drop `--verify-no-changes` to fix.
+2. Check that everything parses and compiles. Ask the user for the Godot executable path if you don't know it (the .NET build is usually named `Godot_v4.7.2-stable_mono_win64.exe`).
+   - C#: `dotnet build` in the repo root. Grep for `error CS` and `warning CS`.
+   - GDScript and scenes: `<godot> --headless --path . --import --quit` imports the project and reports broken scripts and resources. Grep the output for `SCRIPT ERROR`, `Parse Error` and `ERROR:`.
+   - Before `project.godot` exists, use a throwaway project in the scratchpad: an empty `project.godot` plus copies of the files to check.
 
-   Batch mode fails if the project is open in the editor. In that case ask the user to close it, or to check the editor console instead.
+   Having the project open in the editor at the same time is fine, but the editor may reimport afterwards.
 
 ## Safety
 - Never run destructive operations, e.g.:
   - deleting or overwriting files or folders the user hasn't asked about (`rm -rf`, `Remove-Item -Recurse`)
   - `git reset --hard`, `git clean`, `git checkout -- .` / `git restore .`, `git stash drop`
   - deleting branches or tags, rewriting pushed history (rebasing or amending commits that are already pushed)
-  - deleting `Library/`, `.meta` files or assets
+  - deleting `.godot/`, `.uid` or `.import` files, or assets
 - If one seems necessary, stop, explain why and let the user run it or confirm it explicitly.
 - Never force anything: no `git push --force` / `--force-with-lease`, no `-f` flags to bypass checks, no `--no-verify`.
 
@@ -77,11 +98,11 @@ Follow `.editorconfig` (only `[*.cs]` is configured). In short:
 - `main` is protected. Work on a branch, push it and open a pull request, see [CONTRIBUTING.md](CONTRIBUTING.md).
 - Confirm every state-changing git operation with the user first: commit, push, pull, merge, rebase of unpushed work, branch switch, stash, opening a pull request. Skip the confirmation only if the user explicitly asked for that exact operation. Approval for one operation doesn't carry over to the next.
 - Read-only commands (`status`, `diff`, `log`, `show`) are always fine.
-- Check `git status` for `Library/`, `Temp/`, `.csproj`, `.sln` etc. before committing. Afterwards, verify the result with `git status` / `git log`.
+- Check `git status` for `.godot/`, `bin/`, `obj/`, `.vs/`, export builds etc. before committing. Afterwards, verify the result with `git status` / `git log`.
 - Commit messages are short and in past tense, with no trailing period:
   - `Added FPS ticker to HUD`
   - `Fixed controller input in pause menu`
-  - `UIManager improvements`
+  - `UI manager improvements`
 
   If needed, add a body of a few plain sentences after a blank line.
 
@@ -89,10 +110,10 @@ Follow `.editorconfig` (only `[*.cs]` is configured). In short:
 Fill in every section of `.github/pull_request_template.md`, in plain and short sentences:
 - **Summary:** what and why in one or two sentences.
 - **Changes:** bullets of notable changes, not a file list.
-- **Editor setup needed:** everything a teammate must do in the editor after pulling (assign references, add tags or layers, scene or prefab edits you gave as steps). Write "None" if nothing.
+- **Editor setup needed:** everything a teammate must do in the editor after pulling (assign exports, add input actions, groups or physics layers, scene edits you gave as steps). Write "None" if nothing.
 - **Screenshots / video:** leave the placeholder for the author if there is a visual change.
-- **Checklist:** only tick items you actually verified, e.g. the Unity compile check.
+- **Checklist:** only tick items you actually verified, e.g. the compile check.
 
-Mention changes to `ProjectSettings/`, `Packages/manifest.json` or scenes explicitly. The PR title follows the commit message style.
+Mention changes to `project.godot`, autoloads, input actions, `export_presets.cfg` or scenes explicitly. The PR title follows the commit message style.
 
 Copilot code review has its own rules in `.github/instructions/code-review.instructions.md`. Keep them consistent with this file when conventions change.
