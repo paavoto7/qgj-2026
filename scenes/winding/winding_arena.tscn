@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://x1nbjrwv4iug"]
+
+[ext_resource type="Script" uid="uid://c2q0n1seeluhm" path="res://scripts/winding/winding_arena.gd" id="1_arena"]
+
+[node name="WindingArena" type="Node2D" unique_id=1972150469]
+script = ExtResource("1_arena")
