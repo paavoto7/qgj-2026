@@ -1,9 +1,10 @@
 class_name GameOverScreen
 extends MenuBase
-## Game over screen for winding combat. Builds its own label and restarts the scene on accept.
+## Game over screen for winding combat. Builds its own label, restarts on accept and returns to the menu on cancel.
 
-@export var message: String = "The thread snapped.\nPress Enter to try again."
+@export var message: String = "The thread snapped.\nEnter to try again, Esc for the main menu."
 @export var font_size: int = 32
+@export_file("*.tscn") var menu_scene: String = "res://scenes/ui/main_menu.tscn"
 
 
 func _ready() -> void:
@@ -17,5 +18,10 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if visible and event.is_action_pressed("ui_accept"):
+	if not visible:
+		return
+
+	if event.is_action_pressed("ui_accept"):
 		MainManager.reload_scene()
+	elif event.is_action_pressed("ui_cancel"):
+		MainManager.change_scene(menu_scene)
