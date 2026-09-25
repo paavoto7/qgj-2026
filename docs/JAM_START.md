@@ -27,7 +27,8 @@ Create these in the FileSystem dock:
 ## 5. Scenes
 1. Create `scenes/main_menu.tscn` and `scenes/game.tscn`.
 2. Project Settings > Application > Run > *Main Scene* = `scenes/main_menu.tscn`.
-3. Add global managers as autoloads in Project Settings > Globals once they exist.
+3. `MainManager` and `AudioManager` are already autoloads (Project Settings > Globals).
+4. Audio tab at the bottom: add buses named `Music`, `SFX` and `UI`, then save the layout (creates `default_bus_layout.tres`). `AudioManager` falls back to Master without them.
 
 ## 6. Commit
 1. `git checkout -b project-setup`

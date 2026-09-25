@@ -6,7 +6,7 @@ Guidance for AI coding agents working in this repository. For people, see [READM
 ## Project
 - Godot game for Quantum Game Jam 2026, Godot **4.7.2** (.NET build, so both GDScript and C# work).
 - The repo root is the Godot project root (`res://`). `project.godot` gets added at jam start, see [docs/JAM_START.md](docs/JAM_START.md).
-- No starter scripts exist yet. When adding shared systems, follow the architecture section below.
+- Starter scripts are under `scripts/`, the README has a table of what each does.
 
 ## Languages
 **GDScript is the default.** Use C# only where it clearly helps (heavy computation, existing C# code, a teammate's preference for their own feature).
@@ -42,14 +42,20 @@ Godot .NET compiles against the `TargetFramework` in the generated `.csproj` (.N
 - Folder and file names in `snake_case` (`scenes/player/player.tscn`, `scripts/player.gd`), except C# files which must match their PascalCase class.
 
 ## Architecture
-Prefer Godot's built-in patterns over building parallel ones:
-- **Autoloads** (Project Settings > Globals) for global managers, e.g. game state, scene loading, sound. They exist in every scene, including when running a single scene with F6.
+Use the existing systems instead of building parallel ones:
+- `MainManager` (autoload) for scene changes, pausing, quitting and save data. Don't call `get_tree().change_scene_to_file` or set `get_tree().paused` elsewhere.
+- `AudioManager` (autoload) for music, UI sounds and one-shot SFX. Looping or per-object sounds use their own `AudioStreamPlayer`.
+- `GameData` for anything saved between sessions. Only `@export` variables are saved.
+- `StateMachine` + `StateBase` for state-based behaviour (player, enemies, game flow).
+- `MenuBase` for every menu or screen, one scene each under a `CanvasLayer`.
+- Components as child nodes: `Health`, `DamageZone`, `Interactable` / `Interactor`, `FlashEffect`, `HoverEffect`. They work in both 2D and 3D. Find them with `Health.find_in(node)` / `Interactable.find_in(node)`.
+
+New global managers are autoloads (Project Settings > Globals), so they exist in every scene, including when running a single scene with F6.
+
+General Godot patterns:
 - **Scenes** as reusable building blocks, instanced instead of copy-pasted.
 - **Signals** for communication upwards and between siblings, direct calls downwards ("call down, signal up").
 - **Resources** (`extends Resource` with `class_name`) for data such as item or enemy stats, instead of hard-coded values.
-- One scene per screen or menu under a `CanvasLayer`. Show and hide them through a single UI manager once one exists.
-- A node-based state machine (a `StateMachine` node with `State` children) for player, enemy and game flow logic.
-- Scene changes through one place (an autoload), not `get_tree().change_scene_to_file` scattered around.
 
 Abstractions are welcome. Prefer reusable, generic building blocks, such as base classes, Resources, scenes and signals, over one-off code, as long as they stay understandable. No tests or test frameworks for now, and ask before adding addons, NuGet packages or other dependencies.
 
