@@ -1,8 +1,10 @@
+@tool
 @abstract
 class_name EnemyType
 extends Node
 ## Component that decides an Enemy's type. Add exactly one as a child of an Enemy.
 ## It decides how the thread's winding counts, which way to wind and what colour the enemy is.
+## Subclasses must be tool scripts too, so the enemy is drawn in the editor.
 
 var enemy: Enemy:
 	get:

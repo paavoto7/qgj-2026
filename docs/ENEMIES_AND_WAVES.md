@@ -30,6 +30,7 @@ For example, a clockwise enemy that needs 3 winds:
 When no existing type fits the rule you want:
 1. Create `scripts/npc/enemy_types/<name>_type.gd` (e.g. `spiral_type.gd`) that extends `EnemyType`:
    ```gdscript
+   @tool
    class_name SpiralType
    extends EnemyType
    ## Short description of the rule.
@@ -44,6 +45,7 @@ When no existing type fits the rule you want:
    func get_color() -> Color:
    	return color
    ```
+   Keep the `@tool` line. It makes the enemy draw in the editor, which calls the type's methods. `@tool` isn't inherited, so every type script needs its own. Anything that shouldn't run in the editor goes behind `if Engine.is_editor_hint(): return`.
 2. Implement both required methods:
    - `wound_amount(windings)`: how many winds the thread has made in the direction this enemy needs. `windings` has the winding around every enemy in the arena, positive = clockwise. The enemy is knotted once this reaches `winds_needed()`.
    - `get_color()`: the enemy's colour.

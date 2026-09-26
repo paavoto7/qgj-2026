@@ -1,7 +1,9 @@
+@tool
 class_name Enemy
 extends Node2D
 ## Enemy that dies when the thread winds around it in the right pattern.
 ## Its EnemyType child component decides the pattern. Positive winds are clockwise.
+## A tool script so it's drawn in the editor. Gameplay code is skipped there.
 
 ## How much of a wind can be missing and still count. Keeps sloppy loops forgiving.
 const TOLERANCE: float = 0.15
@@ -22,6 +24,12 @@ var _progress: float = 0.0
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		# Pick up a Type child added or removed while editing
+		child_order_changed.connect(func() -> void: type = EnemyType.find_in(self))
+		set_physics_process(false)
+		return
+
 	if not is_instance_valid(type):
 		push_error("Enemy '%s' needs an EnemyType child component." % name)
 		set_physics_process(false)

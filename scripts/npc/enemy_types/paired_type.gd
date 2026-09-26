@@ -1,3 +1,4 @@
+@tool
 class_name PairedType
 extends EnemyType
 ## The enemy is linked to a partner. One loop around both, in either direction, knots them together.
@@ -46,6 +47,10 @@ func on_spawned(group: Array[Enemy]) -> void:
 
 
 func draw_extras() -> void:
+	# Nothing links partners in the editor, so link to a sibling to preview the pair
+	if Engine.is_editor_hint() and not has_partner():
+		on_spawned(_sibling_enemies())
+
 	# Draw each pair link once
 	if has_partner() and get_instance_id() < partner.get_instance_id():
 		# From edge to edge, so the line doesn't cover either body
@@ -63,3 +68,13 @@ func steer(velocity: Vector2) -> Vector2:
 	# Spring towards the partner so the pair stays loopable as one
 	var offset: Vector2 = partner.enemy.position - enemy.position
 	return velocity + offset.normalized() * (offset.length() - PAIR_DISTANCE) * 2.0
+
+
+func _sibling_enemies() -> Array[Enemy]:
+	var siblings: Array[Enemy] = []
+	var parent: Node = enemy.get_parent()
+	if parent:
+		for child: Node in parent.get_children():
+			if child is Enemy:
+				siblings.append(child)
+	return siblings
