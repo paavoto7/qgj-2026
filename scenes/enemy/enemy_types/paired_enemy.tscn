@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://crg0pf132u3fl"]
+
+[ext_resource type="PackedScene" uid="uid://dbietblxprcs" path="res://scenes/enemy/enemy.tscn" id="1_rxuch"]
+[ext_resource type="Script" uid="uid://ce8d10psvk8vf" path="res://scripts/npc/enemy_types/paired_type.gd" id="2_at1hy"]
+
+[node name="PairedEnemy" unique_id=210352966 instance=ExtResource("1_rxuch")]
+
+[node name="Type" type="Node" parent="." index="0" unique_id=1215314204]
+script = ExtResource("2_at1hy")

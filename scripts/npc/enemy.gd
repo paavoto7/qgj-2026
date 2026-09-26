@@ -1,43 +1,36 @@
-class_name KnotEnemy
+class_name Enemy
 extends Node2D
 ## Enemy that dies when the thread winds around it in the right pattern.
-## Positive winds are clockwise, negative counterclockwise. With a partner, one loop around both knots them.
+## Its EnemyType child component decides the pattern. Positive winds are clockwise.
 
-## How far apart linked partners try to stay.
-const PAIR_DISTANCE: float = 110.0
 ## How much of a wind can be missing and still count. Keeps sloppy loops forgiving.
 const TOLERANCE: float = 0.15
 const RING_SPACING: float = 5.0
 
-@export var required_winds: int = 2
 @export var speed: float = 55.0
 @export var radius: float = 16.0
-@export var clockwise_color: Color = Color(1.0, 0.4, 0.4)
-@export var counterclockwise_color: Color = Color(0.4, 0.7, 1.0)
-@export var pair_color: Color = Color(0.6, 1.0, 0.5)
 
-var partner: KnotEnemy
 var target: Node2D
 var is_knotted: bool = false
 var color: Color:
 	get:
-		if has_partner():
-			return pair_color
-		return clockwise_color if required_winds > 0 else counterclockwise_color
+		return type.get_color() if is_instance_valid(type) else Color.WHITE
 
 var _progress: float = 0.0
+
+@onready var type: EnemyType = EnemyType.find_in(self)
+
+
+func _ready() -> void:
+	if not is_instance_valid(type):
+		push_error("Enemy '%s' needs an EnemyType child component." % name)
+		set_physics_process(false)
 
 
 func _physics_process(delta: float) -> void:
 	if is_knotted or not is_instance_valid(target):
 		return
-
-	var velocity: Vector2 = position.direction_to(target.position) * speed
-	if has_partner():
-		# Spring towards the partner so the pair stays loopable as one
-		var offset: Vector2 = partner.position - position
-		velocity += offset.normalized() * (offset.length() - PAIR_DISTANCE) * 2.0
-	position += velocity * delta
+	position += type.steer(position.direction_to(target.position) * speed) * delta
 
 
 func _process(_delta: float) -> void:
@@ -47,10 +40,12 @@ func _process(_delta: float) -> void:
 func _draw() -> void:
 	draw_circle(Vector2.ZERO, radius, color.darkened(0.6))
 	draw_arc(Vector2.ZERO, radius, 0.0, TAU, 32, color, 2.0)
+	if not is_instance_valid(type):
+		return
 
 	# One ring per wind needed, filling up clockwise or counterclockwise from the top
-	var winds: int = _winds_needed()
-	var direction: float = _direction()
+	var winds: int = type.winds_needed()
+	var direction: float = type.direction()
 	var filled: float = _progress * winds
 	for i: int in winds:
 		var ring_radius: float = radius + 6.0 + i * RING_SPACING
@@ -67,22 +62,33 @@ func _draw() -> void:
 		tip + Vector2(-direction * 3.0, 5.0),
 	]), color)
 
+	type.draw_extras()
 
-## Partners always knot together, so a valid partner means this enemy is part of a pair.
-func has_partner() -> bool:
-	return is_instance_valid(partner)
+
+## Returns the enemies in a freshly instantiated scene: the root if it's an Enemy, otherwise its Enemy children.
+## Children are taken out of the group, keeping their position as an offset from it, and the group is freed.
+static func take_from(node: Node) -> Array[Enemy]:
+	var enemies: Array[Enemy] = []
+	if node is Enemy:
+		enemies.append(node)
+		return enemies
+
+	for child: Node in node.get_children():
+		if child is Enemy:
+			node.remove_child(child)
+			enemies.append(child)
+	node.free()
+	return enemies
 
 
 ## Updates the progress rings and returns true when the thread knots this enemy.
-func evaluate(winding: float, partner_winding: float) -> bool:
-	var along: float
-	if has_partner():
-		# Both must be wound the same way, so a loop around the pair counts but a figure eight doesn't
-		along = minf(absf(winding), absf(partner_winding)) if signf(winding) == signf(partner_winding) else 0.0
-	else:
-		along = winding * signf(required_winds)
+## [param windings] holds the thread's winding around every enemy in the arena.
+func evaluate(windings: Dictionary[Enemy, float]) -> bool:
+	if not is_instance_valid(type):
+		return false
 
-	var needed: float = _winds_needed()
+	var along: float = type.wound_amount(windings)
+	var needed: float = type.winds_needed()
 	_progress = clampf(along / needed, 0.0, 1.0)
 	return along >= needed - TOLERANCE
 
@@ -91,13 +97,5 @@ func knot() -> void:
 	is_knotted = true
 	var tween: Tween = create_tween().set_parallel()
 	tween.tween_property(self, "scale", Vector2.ZERO, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
-	tween.tween_property(self, "rotation", _direction() * TAU, 0.3)
+	tween.tween_property(self, "rotation", type.direction() * TAU, 0.3)
 	tween.chain().tween_callback(queue_free)
-
-
-func _winds_needed() -> int:
-	return 1 if has_partner() else maxi(absi(required_winds), 1)
-
-
-func _direction() -> float:
-	return -1.0 if required_winds < 0 and not has_partner() else 1.0

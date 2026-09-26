@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://dnc8437p2n4uj"]
+
+[ext_resource type="PackedScene" uid="uid://dbietblxprcs" path="res://scenes/enemy/enemy.tscn" id="1_i04ni"]
+[ext_resource type="Script" uid="uid://dack7iip2h46r" path="res://scripts/npc/enemy_types/clockwise_type.gd" id="2_unk72"]
+
+[node name="ClockwiseEnemy" unique_id=210352966 instance=ExtResource("1_i04ni")]
+
+[node name="Type" type="Node" parent="." index="0" unique_id=1442501842]
+script = ExtResource("2_unk72")

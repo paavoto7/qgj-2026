@@ -4,6 +4,7 @@ Our game for Quantum Game Jam 2026.
 - Engine: Godot **4.7.2**, .NET build (GDScript and C#).
 - Getting started and commit workflow: [CONTRIBUTING.md](CONTRIBUTING.md).
 - Setting up the project at jam start: [docs/JAM_START.md](docs/JAM_START.md).
+- Adding enemies and waves: [docs/ENEMIES_AND_WAVES.md](docs/ENEMIES_AND_WAVES.md).
 
 ## Starter scripts
 Reusable scripts under `scripts/`, taken from our GGJ 2026 project and cleaned up. Components work in both 2D and 3D.

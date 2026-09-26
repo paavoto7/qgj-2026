@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="WaveData" format=3 uid="uid://cq8p0tkcrr1s7"]
+
+[ext_resource type="PackedScene" uid="uid://b54y77jo58ion" path="res://scenes/enemy/enemy_types/enemy_pair.tscn" id="1_pn4d1"]
+[ext_resource type="Script" uid="uid://cmfv7ooftmf26" path="res://scripts/waves/wave_data.gd" id="2_ecy8v"]
+[ext_resource type="PackedScene" uid="uid://dnc8437p2n4uj" path="res://scenes/enemy/enemy_types/clockwise_enemy.tscn" id="2_rnfa1"]
+
+[resource]
+script = ExtResource("2_ecy8v")
+enemies = Array[PackedScene]([ExtResource("1_pn4d1"), ExtResource("2_rnfa1")])
+metadata/_custom_type_script = "uid://cmfv7ooftmf26"
