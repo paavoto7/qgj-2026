@@ -7,3 +7,5 @@
 
 [node name="Type" type="Node" parent="." index="0" unique_id=1442501842]
 script = ExtResource("2_unk72")
+color = Color(1, 0.4, 0.4, 1)
+winds = 2

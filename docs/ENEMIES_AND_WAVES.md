@@ -3,13 +3,13 @@ How enemies are built and how to add new enemies and waves. Everything except a 
 
 ## How it fits together
 - **`Enemy`** (`scripts/npc/enemy.gd`) is the shared enemy: chasing the player, drawing the rings and arrow, checking the thread's winding and the knot animation. Its scene is `scenes/enemy/enemy.tscn`.
-- **`EnemyType`** (`scripts/npc/enemy_type.gd`) is a component, a child node of the `Enemy`, like a Unity component. It decides how the winding counts, which way to wind and the colour. Every enemy has exactly one. The types are in `scripts/npc/enemy_types/`:
+- **`EnemyType`** (`scripts/npc/enemy_type.gd`) is a component, a child node of the `Enemy`, like a Unity component. It decides how the winding counts and which way to wind. Every enemy has exactly one. All types have *Color*, *Winds* (how many winds knot it, 1 by default) and *Clockwise* (which way to wind, on by default), set on the `Type` node in each enemy scene. The types are in `scripts/npc/enemy_types/`:
 
-  | Type | Rule | Settings |
-  | --- | --- | --- |
-  | `ClockwiseType` | Wind clockwise *Winds* times. | *Winds*, *Color* |
-  | `CounterclockwiseType` | Wind counterclockwise *Winds* times. | *Winds*, *Color* |
-  | `PairedType` | Linked to a partner. One loop around both, in either direction. | *Color* |
+  | Type | Rule |
+  | --- | --- |
+  | `ClockwiseType` | Wind clockwise *Winds* times. |
+  | `CounterclockwiseType` | Wind counterclockwise *Winds* times. |
+  | `PairedType` | Linked to a partner. Loop around both *Winds* times, in either direction. |
 
 - **Enemy scenes** inherit `enemy.tscn` and add a type component, like a Unity prefab variant. They're in `scenes/enemy/enemy_types/`.
 - **Group scenes** are a plain `Node2D` with enemy scenes as children, e.g. `scenes/enemy/enemy_types/enemy_pair.tscn`. They spawn together and keep their layout.
@@ -35,34 +35,29 @@ When no existing type fits the rule you want:
    extends EnemyType
    ## Short description of the rule.
 
-   @export var color: Color = Color(1.0, 0.8, 0.3)
-
 
    func wound_amount(windings: Dictionary[Enemy, float]) -> float:
-   	return windings.get(enemy, 0.0)
-
-
-   func get_color() -> Color:
-   	return color
+   	return windings.get(enemy, 0.0) * direction()
    ```
    Keep the `@tool` line. It makes the enemy draw in the editor, which calls the type's methods. `@tool` isn't inherited, so every type script needs its own. Anything that shouldn't run in the editor goes behind `if Engine.is_editor_hint(): return`.
-2. Implement both required methods:
-   - `wound_amount(windings)`: how many winds the thread has made in the direction this enemy needs. `windings` has the winding around every enemy in the arena, positive = clockwise. The enemy is knotted once this reaches `winds_needed()`.
-   - `get_color()`: the enemy's colour.
 
-   Godot won't parse the script if either is missing.
+   *Color*, *Winds* and *Clockwise* come from `EnemyType`. Don't declare them again in the new type, set them in its scene instead.
+2. Implement the required method `wound_amount(windings)`: how many winds the thread has made in the direction this enemy needs. `windings` has the winding around every enemy in the arena, positive = clockwise. The enemy is knotted once this reaches `winds_needed()`. Godot won't parse the script if it's missing.
 3. Override the optional ones if needed:
 
    | Method | Default | Use it for |
    | --- | --- | --- |
-   | `winds_needed() -> int` | `1` | Number of rings, and winds needed to knot. |
-   | `direction() -> float` | `1.0` | `1.0` clockwise, `-1.0` counterclockwise. Flips the rings and arrow. |
+   | `get_color() -> Color` | *Color* | A colour that changes, e.g. with state. |
+   | `winds_needed() -> int` | *Winds* | Number of rings, and winds needed to knot. |
+   | `get_speed() -> float` | the enemy's *Speed* | A different chase speed, applied when the enemy is ready. |
+   | `get_radius() -> float` | the enemy's *Radius* | A different size, applied when the enemy is ready. |
+   | `direction() -> float` | *Clockwise* as `1.0` / `-1.0` | `1.0` clockwise, `-1.0` counterclockwise. Flips the rings and arrow. Multiply by it in `wound_amount` so the rule follows *Clockwise*. |
    | `steer(velocity) -> Vector2` | chase the player | Different movement. Return the new velocity. |
    | `on_spawned(group)` | nothing | Setup that needs the other enemies from the same scene, like `PairedType` linking up. |
    | `draw_extras()` | nothing | Extra drawing, like the pair's dashed line. Draw with `enemy.draw_*`, in the enemy's local space. |
 
    The type's enemy is available as `enemy`.
-4. Make a scene for it: right-click `scenes/enemy/enemy.tscn` > *New Inherited Scene*. Rename the root (e.g. `SpiralEnemy`), add a `Node` child named `Type`, attach the new script, and save it as `scenes/enemy/enemy_types/spiral_enemy.tscn`.
+4. Make a scene for it: right-click `scenes/enemy/enemy.tscn` > *New Inherited Scene*. Rename the root (e.g. `SpiralEnemy`), add a `Node` child named `Type`, attach the new script, set its *Color* and *Winds*, and save it as `scenes/enemy/enemy_types/spiral_enemy.tscn`.
 5. Add the scene to a wave or to *Random Enemies*.
 
 ## Add a group of enemies

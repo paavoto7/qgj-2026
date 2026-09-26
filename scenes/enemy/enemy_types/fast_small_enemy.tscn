@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://ductckbu25n13"]
+
+[ext_resource type="PackedScene" uid="uid://dbietblxprcs" path="res://scenes/enemy/enemy.tscn" id="1_4pkxa"]
+[ext_resource type="Script" uid="uid://blkej0obfnx1d" path="res://scripts/npc/enemy_types/fastsmall_type.gd" id="2_kuty8"]
+
+[node name="FastSmallEnemy" unique_id=210352966 instance=ExtResource("1_4pkxa")]
+
+[node name="Type" type="Node" parent="." index="0" unique_id=853110580]
+script = ExtResource("2_kuty8")
+color = Color(0, 0, 0, 1)

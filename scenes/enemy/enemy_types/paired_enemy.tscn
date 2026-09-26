@@ -7,3 +7,4 @@
 
 [node name="Type" type="Node" parent="." index="0" unique_id=1215314204]
 script = ExtResource("2_at1hy")
+color = Color(0.6, 1, 0.5, 1)

@@ -6,8 +6,6 @@ extends EnemyType
 ## How far apart linked partners try to stay.
 const PAIR_DISTANCE: float = 110.0
 
-@export var color: Color = Color(0.6, 1.0, 0.5)
-
 var partner: PairedType
 
 
@@ -31,10 +29,6 @@ func wound_amount(windings: Dictionary[Enemy, float]) -> float:
 	if signf(winding) != signf(partner_winding):
 		return 0.0
 	return minf(absf(winding), absf(partner_winding))
-
-
-func get_color() -> Color:
-	return color
 
 
 ## Links with the other paired enemy spawned from the same scene.
