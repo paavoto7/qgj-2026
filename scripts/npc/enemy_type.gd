@@ -63,6 +63,11 @@ func on_spawned(_group: Array[Enemy]) -> void:
 	pass
 
 
+## Called when the enemy is knotted, before it disappears. Spawn extra enemies with [method Enemy.spawn].
+func on_knotted() -> void:
+	pass
+
+
 ## Called at the end of Enemy._draw. Draw on [member enemy], in its local space.
 func draw_extras() -> void:
 	pass

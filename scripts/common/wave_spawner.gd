@@ -26,6 +26,14 @@ func next_wave() -> void:
 	wave_started.emit(_current_wave_data(), _wave)
 
 
+## Adds an enemy to the arena and tracks it. Enemies it spawns, e.g. by splitting, are added too.
+func add_enemy(enemy: Enemy) -> void:
+	enemy.target = _target
+	add_child(enemy)
+	enemies.append(enemy)
+	enemy.spawned.connect(add_enemy)
+
+
 ## The scripted waves in order, then random picks that grow with the wave number.
 func _wave_scenes() -> Array[PackedScene]:
 	var wave_data: WaveData = _current_wave_data()
@@ -48,9 +56,7 @@ func _spawn(scene: PackedScene) -> void:
 	var group: Array[Enemy] = Enemy.take_from(scene.instantiate())
 	for enemy: Enemy in group:
 		enemy.position = (spawn_point + enemy.position).clamp(_bounds.position, _bounds.end)
-		enemy.target = _target
-		add_child(enemy)
-		enemies.append(enemy)
+		add_enemy(enemy)
 
 	for enemy: Enemy in group:
 		if is_instance_valid(enemy.type):
