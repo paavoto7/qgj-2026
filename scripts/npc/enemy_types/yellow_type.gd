@@ -38,7 +38,12 @@ func steer(velocity: Vector2) -> Vector2:
 	return velocity
 
 
-func split() -> Array[Enemy]:
+func on_knotted() -> void:
+	for child: Enemy in _split():
+		enemy.spawn(child)
+
+
+func _split() -> Array[Enemy]:
 	if not _can_split:
 		return []
 

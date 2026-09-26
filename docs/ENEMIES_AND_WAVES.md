@@ -11,6 +11,7 @@ How enemies are built and how to add new enemies and waves. Everything except a 
   | `CounterclockwiseType` | Wind counterclockwise *Winds* times. |
   | `PairedType` | Linked to a partner. Loop around both *Winds* times, in either direction. |
   | `FastSmallType` | Wind *Winds* times in its direction. Moves *Speed Multiplier* times faster (3 by default) and is *Radius Multiplier* times the size (0.5 by default). |
+  | `YellowType` | Wind once in a random direction, picked when it spawns. When knotted, it splits into two smaller, faster copies that don't split again. |
   | `RangedEnemyType` | Wind *Winds* times in its direction. Pair it with a ranged `Attack`, see `ranged_enemy.tscn`. |
 
 - **Enemy scenes** inherit `enemy.tscn` and add a type component, like a Unity prefab variant. They're in `scenes/enemy/enemy_types/`.
@@ -57,6 +58,7 @@ When no existing type fits the rule you want:
    | `direction() -> float` | *Clockwise* as `1.0` / `-1.0` | `1.0` clockwise, `-1.0` counterclockwise. Flips the rings and arrow. Multiply by it in `wound_amount` so the rule follows *Clockwise*. |
    | `steer(velocity) -> Vector2` | chase the player | Different movement. Return the new velocity. |
    | `on_spawned(group)` | nothing | Setup that needs the other enemies from the same scene, like `PairedType` linking up. |
+   | `on_knotted()` | nothing | Something that happens when the enemy is knotted, like `YellowType` splitting. Create new enemies with `scene.instantiate()` and hand them over with `enemy.spawn(new_enemy)`, the spawner adds them to the arena. |
    | `draw_extras()` | nothing | Extra drawing, like the pair's dashed line. Draw with `enemy.draw_*`, in the enemy's local space. |
 
    The type's enemy is available as `enemy`.
@@ -86,6 +88,7 @@ All scenes are in `scenes/enemy/enemy_types/`.
 | `paired_enemy.tscn` | `PairedType`. Only spawn it inside a group, alone it has no partner. |
 | `enemy_pair.tscn` | Group of two `paired_enemy` |
 | `fast_small_enemy.tscn` | `FastSmallType`, 1 wind clockwise, 3× speed, half size |
+| `yellow_enemy.tscn` | `YellowType`, splits into two when knotted |
 | `ranged_enemy.tscn` | `RangedEnemyType`, 1 wind clockwise. Its `Attack` is ranged: shoots `assets/projectiles/orb.tscn` from 400 px away. |
 
 Every enemy inherits a melee `Attack` from `enemy.tscn` (1 damage, 10 px reach, 0.5 s cooldown), which `ranged_enemy.tscn` overrides.

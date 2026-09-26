@@ -5,6 +5,9 @@ extends Node2D
 ## Its EnemyType child component decides the pattern. Positive winds are clockwise.
 ## A tool script so it's drawn in the editor. Gameplay code is skipped there.
 
+## Emitted when this enemy creates a new one, e.g. by splitting. Whoever owns the enemies adds it to the scene.
+signal spawned(new_enemy: Enemy)
+
 ## How much of a wind can be missing and still count. Keeps sloppy loops forgiving.
 const TOLERANCE: float = 0.15
 const RING_SPACING: float = 5.0
@@ -144,10 +147,19 @@ func evaluate(windings: Dictionary[Enemy, float]) -> bool:
 
 func knot() -> void:
 	is_knotted = true
+	if is_instance_valid(type):
+		type.on_knotted()
+
 	var tween: Tween = create_tween().set_parallel()
 	tween.tween_property(self, "scale", Vector2.ZERO, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
 	tween.tween_property(self, "rotation", type.direction() * TAU, 0.3)
 	tween.chain().tween_callback(queue_free)
+
+
+## Hands a new enemy, not yet in the tree, to whoever owns the enemies. It chases the same target.
+func spawn(new_enemy: Enemy) -> void:
+	new_enemy.target = target
+	spawned.emit(new_enemy)
 
 
 func _attack_in_range() -> void:
