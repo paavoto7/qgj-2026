@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://lio0ro084sao"]
+
+[ext_resource type="Script" uid="uid://3vtjdbg00j77" path="res://scripts/ui/hud.gd" id="1_0mwgc"]
+[ext_resource type="Script" uid="uid://ce11c2i7sv2qe" path="res://scripts/ui/game_over_screen.gd" id="2_hqnrr"]
+
+[node name="HUD" type="Control" unique_id=1987713260]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_0mwgc")
+
+[node name="ScoreLabel" type="Label" parent="." unique_id=53832777]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="GameOverScreen" type="CanvasLayer" parent="." unique_id=1996190839]
+script = ExtResource("2_hqnrr")

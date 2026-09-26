@@ -10,11 +10,14 @@ How enemies are built and how to add new enemies and waves. Everything except a 
   | `ClockwiseType` | Wind clockwise *Winds* times. |
   | `CounterclockwiseType` | Wind counterclockwise *Winds* times. |
   | `PairedType` | Linked to a partner. Loop around both *Winds* times, in either direction. |
+  | `FastSmallType` | Wind *Winds* times in its direction. Moves *Speed Multiplier* times faster (3 by default) and is *Radius Multiplier* times the size (0.5 by default). |
+  | `RangedEnemyType` | Wind *Winds* times in its direction. Pair it with a ranged `Attack`, see `ranged_enemy.tscn`. |
 
 - **Enemy scenes** inherit `enemy.tscn` and add a type component, like a Unity prefab variant. They're in `scenes/enemy/enemy_types/`.
 - **Group scenes** are a plain `Node2D` with enemy scenes as children, e.g. `scenes/enemy/enemy_types/enemy_pair.tscn`. They spawn together and keep their layout.
-- **`WaveData`** (`scripts/waves/wave_data.gd`) is a Resource with a list of enemy or group scenes and an optional HUD *Hint*. Waves are saved in `resources/waves/`.
-- **The arena** (`scenes/arena/arena.tscn`) plays its *Waves* in order. After that it makes random waves from *Random Enemies*, one more enemy each wave, up to *Max Random Enemies*.
+- **`WaveData`** (`scripts/resources/waves/wave_data.gd`) is a Resource with a list of enemy or group scenes and an optional HUD *Hint*. Waves are saved in `resources/waves/`.
+- **`ArenaData`** (`scripts/resources/arena/arena_data.gd`) is a Resource with an arena's settings: the player scene, *Waves*, *Random Enemies* and *Max Random Enemies*. The current one is `resources/arena/test_arena.tres`, assigned to the `Arena` node's *Arena Data*.
+- **The arena** (`scenes/arena/arena.tscn`) has a `WaveSpawner` child that plays the *Waves* in order. After that it makes random waves from *Random Enemies*, one more enemy each wave, up to *Max Random Enemies*.
 
 The arena doesn't know about specific enemy types. It only instantiates scenes.
 
@@ -24,7 +27,7 @@ For example, a clockwise enemy that needs 3 winds:
 2. Rename the root, e.g. `Clockwise3Enemy`.
 3. Select the `Type` node and set *Winds* = 3. The root `Enemy` node has *Speed* and *Radius* too.
 4. Save it as `scenes/enemy/enemy_types/clockwise_3_enemy.tscn`.
-5. Add it to a wave or to the arena's *Random Enemies*.
+5. Add it to a wave or to *Random Enemies* in the arena's `ArenaData`.
 
 ## Add a new enemy type
 When no existing type fits the rule you want:
@@ -69,7 +72,7 @@ When no existing type fits the rule you want:
 ## Add or change a wave
 1. Right-click `resources/waves/` > *Create New* > *Resource…* > `WaveData`, and save it as e.g. `wave_4.tres`.
 2. In the inspector, add scenes to *Enemies*. The same scene can be added more than once. Optionally, write a *Hint*, which shows under the HUD during that wave.
-3. Open `scenes/arena/arena.tscn`, select `Arena`, and add the wave to *Waves* in the position it should play.
+3. Open the arena's `ArenaData` (`resources/arena/test_arena.tres`) and add the wave to *Waves* in the position it should play.
 
 To change an existing wave, open its `.tres` file and edit it. The arena picks the change up automatically.
 
@@ -82,11 +85,18 @@ All scenes are in `scenes/enemy/enemy_types/`.
 | `counterclockwise_enemy.tscn` | `CounterclockwiseType`, 1 wind |
 | `paired_enemy.tscn` | `PairedType`. Only spawn it inside a group, alone it has no partner. |
 | `enemy_pair.tscn` | Group of two `paired_enemy` |
+| `fast_small_enemy.tscn` | `FastSmallType`, 1 wind clockwise, 3× speed, half size |
+| `ranged_enemy.tscn` | `RangedEnemyType`, 1 wind clockwise. Its `Attack` is ranged: shoots `assets/projectiles/orb.tscn` from 400 px away. |
+
+Every enemy inherits a melee `Attack` from `enemy.tscn` (1 damage, 10 px reach, 0.5 s cooldown), which `ranged_enemy.tscn` overrides.
+
+`resources/arena/test_arena.tres` plays these waves in order:
 
 | Wave | Enemies |
 | --- | --- |
+| `testwave.tres` | `fast_small_enemy`, `ranged_enemy` |
 | `wave_1.tres` | `clockwise_enemy` |
 | `wave_2.tres` | `counterclockwise_enemy` |
 | `wave_3.tres` | `enemy_pair`, `clockwise_enemy` |
 
-*Random Enemies*: `clockwise_enemy`, `counterclockwise_enemy`, `enemy_pair`.
+*Random Enemies*: `clockwise_enemy`, `counterclockwise_enemy`, `enemy_pair`, `fast_small_enemy`, `ranged_enemy`.

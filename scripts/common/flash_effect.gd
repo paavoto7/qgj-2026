@@ -31,6 +31,7 @@ func _ready() -> void:
 		push_warning("FlashEffect: parent must be a CanvasItem or GeometryInstance3D")
 
 
+## Flashes the parent node. If it's already flashing, it will restart the flash.
 func flash() -> void:
 	stop()
 	_tween = create_tween().set_loops(max(flash_count, 1))
@@ -51,3 +52,8 @@ func stop() -> void:
 		_target.modulate = _original_modulate
 	elif _target is GeometryInstance3D:
 		_target.transparency = _original_transparency
+
+
+## Sets the number of flashes based on the invulnerability time of a Health component. The player will flash for as long as they are invulnerable.
+func set_flash_count_by_health(health: Health) -> void:
+	flash_count = maxi(ceili(health.invulnerability_time / flash_duration), 1)

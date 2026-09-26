@@ -1,24 +1,30 @@
 [gd_scene format=3 uid="uid://x1nbjrwv4iug"]
 
 [ext_resource type="Script" uid="uid://c2q0n1seeluhm" path="res://scripts/common/arena.gd" id="1_arena"]
-[ext_resource type="PackedScene" uid="uid://bsb4mqfrfa24x" path="res://scenes/player.tscn" id="2_6w4xk"]
-[ext_resource type="PackedScene" uid="uid://dnc8437p2n4uj" path="res://scenes/enemy/enemy_types/clockwise_enemy.tscn" id="2_aj7ud"]
-[ext_resource type="Script" uid="uid://cmfv7ooftmf26" path="res://scripts/waves/wave_data.gd" id="2_jx0ua"]
-[ext_resource type="PackedScene" uid="uid://dn35743gscsgg" path="res://scenes/enemy/enemy_types/counterclockwise_enemy.tscn" id="3_asdgj"]
-[ext_resource type="Resource" uid="uid://dju6a6wolb4qo" path="res://resources/waves/wave_1.tres" id="3_u52cf"]
-[ext_resource type="Resource" uid="uid://mx10f1wxjtqu" path="res://resources/waves/wave_2.tres" id="4_u52cf"]
-[ext_resource type="Resource" uid="uid://cq8p0tkcrr1s7" path="res://resources/waves/wave_3.tres" id="5_ii07k"]
-[ext_resource type="PackedScene" uid="uid://b54y77jo58ion" path="res://scenes/enemy/enemy_types/enemy_pair.tscn" id="6_jx0ua"]
-[ext_resource type="Resource" uid="uid://lt2o3dka8cmr" path="res://resources/waves/testwave.tres" id="7_xgbxb"]
-[ext_resource type="PackedScene" uid="uid://ductckbu25n13" path="res://scenes/enemy/enemy_types/fast_small_enemy.tscn" id="11_vmsrg"]
-[ext_resource type="PackedScene" uid="uid://clr1lmpaclh65" path="res://scenes/enemy/enemy_types/white_enemy.tscn" id="12_s83md"]
+[ext_resource type="Resource" uid="uid://dc6pa5ieb3u0m" path="res://resources/arena/test_arena.tres" id="2_8trdl"]
+[ext_resource type="PackedScene" uid="uid://lio0ro084sao" path="res://scenes/ui/hud.tscn" id="3_5tue2"]
+[ext_resource type="Script" uid="uid://crs51xlo6nbea" path="res://scripts/common/wave_spawner.gd" id="4_aj7ud"]
+[ext_resource type="Script" uid="uid://dtie4hy414tp1" path="res://scripts/common/score_keeper.gd" id="5_asdgj"]
 [ext_resource type="PackedScene" uid="uid://w51tbsutbwgl" path="res://scenes/Tilemap.tscn" id="12_vmsrg"]
-[ext_resource type="PackedScene" uid="uid://dhy0a5ypxupjt" path="res://scenes/enemy/enemy_types/yellow_enemy.tscn" id="13_fv88w"]
+
+[sub_resource type="Environment" id="Environment_xgbxb"]
+background_mode = 3
+glow_enabled = true
 
 [node name="Arena" type="Node2D" unique_id=1972150469]
 script = ExtResource("1_arena")
-player_scene = ExtResource("2_6w4xk")
-waves = Array[ExtResource("2_jx0ua")]([ExtResource("7_xgbxb"), ExtResource("3_u52cf"), ExtResource("4_u52cf"), ExtResource("5_ii07k")])
-random_enemies = Array[PackedScene]([ExtResource("2_aj7ud"), ExtResource("3_asdgj"), ExtResource("6_jx0ua"), ExtResource("11_vmsrg"), ExtResource("12_s83md"), ExtResource("13_fv88w")])
+arena_data = ExtResource("2_8trdl")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2145925487]
+environment = SubResource("Environment_xgbxb")
+
+[node name="HUD" parent="." unique_id=1987713260 instance=ExtResource("3_5tue2")]
+
+[node name="WaveSpawner" type="Node2D" parent="." unique_id=2103372409]
+script = ExtResource("4_aj7ud")
+
+[node name="ScoreKeeper" type="Node" parent="." unique_id=152895425]
+script = ExtResource("5_asdgj")
 
 [node name="TileMap" parent="." unique_id=441692976 instance=ExtResource("12_vmsrg")]
+enabled = false

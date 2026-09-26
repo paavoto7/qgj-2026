@@ -1,6 +1,13 @@
 [gd_scene format=3 uid="uid://dbietblxprcs"]
 
 [ext_resource type="Script" uid="uid://dd1gpi3dpyymg" path="res://scripts/npc/enemy.gd" id="1_4a83h"]
+[ext_resource type="Script" uid="uid://do44nfl5pafl" path="res://scripts/interaction/attack.gd" id="2_a3pup"]
 
-[node name="Enemy" type="Node2D" unique_id=210352966]
+[node name="Enemy" type="Node2D" unique_id=210352966 node_paths=PackedStringArray("attack")]
 script = ExtResource("1_4a83h")
+attack = NodePath("Attack")
+
+[node name="Attack" type="Node" parent="." unique_id=761155573]
+script = ExtResource("2_a3pup")
+attack_range = 10.0
+is_melee = true
