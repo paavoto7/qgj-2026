@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://lio0ro084sao" path="res://scenes/ui/hud.tscn" id="3_5tue2"]
 [ext_resource type="Script" uid="uid://crs51xlo6nbea" path="res://scripts/common/wave_spawner.gd" id="4_aj7ud"]
 [ext_resource type="Script" uid="uid://dtie4hy414tp1" path="res://scripts/common/score_keeper.gd" id="5_asdgj"]
+[ext_resource type="PackedScene" uid="uid://w51tbsutbwgl" path="res://scenes/Tilemap.tscn" id="12_vmsrg"]
 
 [sub_resource type="Environment" id="Environment_xgbxb"]
 background_mode = 3
@@ -24,3 +25,6 @@ script = ExtResource("4_aj7ud")
 
 [node name="ScoreKeeper" type="Node" parent="." unique_id=152895425]
 script = ExtResource("5_asdgj")
+
+[node name="TileMap" parent="." unique_id=441692976 instance=ExtResource("12_vmsrg")]
+z_index = -1

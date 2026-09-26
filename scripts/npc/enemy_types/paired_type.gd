@@ -1,12 +1,13 @@
 @tool
 class_name PairedType
 extends EnemyType
-## The enemy is linked to a partner. One loop around both, in either direction, knots them together.
+## The enemy is linked to a partner. Both must be wound in the chosen direction.
 
 ## How far apart linked partners try to stay.
 const PAIR_DISTANCE: float = 110.0
 
 var partner: PairedType
+var _direction: float = 1.0
 
 
 ## Links two paired enemies as partners of each other.
@@ -20,15 +21,15 @@ func has_partner() -> bool:
 
 
 func wound_amount(windings: Dictionary[Enemy, float]) -> float:
-	var winding: float = windings.get(enemy, 0.0)
+	var winding: float = windings.get(enemy, 0.0) * _direction
 	if not has_partner():
-		return winding
+		return maxf(winding, 0.0)
 
-	# Both must be wound the same way, so a loop around the pair counts but a figure eight doesn't
-	var partner_winding: float = windings.get(partner.enemy, 0.0)
-	if signf(winding) != signf(partner_winding):
+	# Both must be wound in the chosen direction, so a loop around the pair counts but a figure eight doesn't.
+	var partner_winding: float = windings.get(partner.enemy, 0.0) * _direction
+	if winding < 0.0 or partner_winding < 0.0:
 		return 0.0
-	return minf(absf(winding), absf(partner_winding))
+	return minf(winding, partner_winding)
 
 
 ## Links with the other paired enemy spawned from the same scene.
@@ -36,8 +37,14 @@ func on_spawned(group: Array[Enemy]) -> void:
 	for other: Enemy in group:
 		var other_type := other.type as PairedType
 		if other_type and other_type != self and not other_type.has_partner():
+			_direction = 1.0 if randf() < 0.5 else -1.0
 			link(self, other_type)
+			other_type._direction = _direction
 			return
+
+
+func direction() -> float:
+	return _direction
 
 
 func draw_extras() -> void:
