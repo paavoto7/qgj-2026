@@ -2,12 +2,28 @@
 
 [ext_resource type="Script" uid="uid://dryxqwupb7hcf" path="res://scripts/interaction/attack/projectile.gd" id="1_hd7y8"]
 
+[sub_resource type="Gradient" id="Gradient_hd7y8"]
+offsets = PackedFloat32Array(0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1)
+colors = PackedColorArray(3.1422384, 0.11791172, 0.1399316, 0, 3.1422384, 0.11791172, 0.1399316, 5.9604645e-08, 3.1422384, 0.11791172, 0.1399316, 1.5258789e-05, 3.1422384, 0.11791172, 0.1399316, 0.00039106607, 3.1422384, 0.11791172, 0.1399316, 0.00390625, 3.1422384, 0.11791172, 0.1399316, 0.023283064, 3.1422384, 0.11791172, 0.1399316, 0.100112915, 3.1422384, 0.11791172, 0.1399316, 0.34360892, 3.1422384, 0.11791172, 0.1399316, 1)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hd7y8"]
+radius = 4.0
+
 [node name="Orb" type="Node2D" unique_id=1073372004]
 script = ExtResource("1_hd7y8")
 colour = Color(3.1422384, 0.11791172, 0.1399316, 1)
+trail_falloff = 8.0
+trail_gradient_steps = 12
 
-[node name="Line2D" type="Line2D" parent="." unique_id=1941528857]
+[node name="Trail" type="Line2D" parent="." unique_id=1941528857]
+gradient = SubResource("Gradient_hd7y8")
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="." unique_id=2025036193]
+
+[node name="HitBox" type="Area2D" parent="." unique_id=1816491381]
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox" unique_id=195015278]
+shape = SubResource("CircleShape2D_hd7y8")
 
 [connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="queue_free"]
