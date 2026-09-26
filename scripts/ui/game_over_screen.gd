@@ -1,6 +1,6 @@
 class_name GameOverScreen
 extends MenuBase
-## Game over screen for winding combat. Builds its own label, restarts on accept and returns to the menu on cancel.
+## Game over screen. Builds its own label, restarts on accept and returns to the menu on cancel.
 
 @export var message: String = "The thread snapped.\nEnter to try again, Esc for the main menu."
 @export var font_size: int = 32
