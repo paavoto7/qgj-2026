@@ -3,6 +3,8 @@
 [ext_resource type="Script" uid="uid://c2q0n1seeluhm" path="res://scripts/common/arena.gd" id="1_arena"]
 [ext_resource type="Resource" uid="uid://dc6pa5ieb3u0m" path="res://resources/arena/test_arena.tres" id="2_8trdl"]
 [ext_resource type="PackedScene" uid="uid://lio0ro084sao" path="res://scenes/ui/hud.tscn" id="3_5tue2"]
+[ext_resource type="Script" uid="uid://crs51xlo6nbea" path="res://scripts/common/wave_spawner.gd" id="4_aj7ud"]
+[ext_resource type="Script" uid="uid://dtie4hy414tp1" path="res://scripts/common/score_keeper.gd" id="5_asdgj"]
 
 [sub_resource type="Environment" id="Environment_xgbxb"]
 background_mode = 3
@@ -16,3 +18,9 @@ arena_data = ExtResource("2_8trdl")
 environment = SubResource("Environment_xgbxb")
 
 [node name="HUD" parent="." unique_id=1987713260 instance=ExtResource("3_5tue2")]
+
+[node name="WaveSpawner" type="Node2D" parent="." unique_id=2103372409]
+script = ExtResource("4_aj7ud")
+
+[node name="ScoreKeeper" type="Node" parent="." unique_id=152895425]
+script = ExtResource("5_asdgj")
