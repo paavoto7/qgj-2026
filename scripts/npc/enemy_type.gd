@@ -38,3 +38,13 @@ func direction() -> float:
 ## Adjusts the enemy's velocity, which chases the target by default.
 func steer(velocity: Vector2) -> Vector2:
 	return velocity
+
+
+## Called once every enemy spawned from the same scene is in the tree, e.g. to link them up.
+func on_spawned(_group: Array[Enemy]) -> void:
+	pass
+
+
+## Called at the end of Enemy._draw. Draw on [member enemy], in its local space.
+func draw_extras() -> void:
+	pass

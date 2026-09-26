@@ -36,6 +36,26 @@ func get_color() -> Color:
 	return color
 
 
+## Links with the other paired enemy spawned from the same scene.
+func on_spawned(group: Array[Enemy]) -> void:
+	for other: Enemy in group:
+		var other_type := other.type as PairedType
+		if other_type and other_type != self and not other_type.has_partner():
+			link(self, other_type)
+			return
+
+
+func draw_extras() -> void:
+	# Draw each pair link once
+	if has_partner() and get_instance_id() < partner.get_instance_id():
+		# From edge to edge, so the line doesn't cover either body
+		var to_partner: Vector2 = partner.enemy.position - enemy.position
+		var heading: Vector2 = to_partner.normalized()
+		var start: Vector2 = heading * enemy.radius
+		var end: Vector2 = to_partner - heading * partner.enemy.radius
+		enemy.draw_dashed_line(start, end, Color(color, 0.5), 2.0, 8.0)
+
+
 func steer(velocity: Vector2) -> Vector2:
 	if not has_partner():
 		return velocity

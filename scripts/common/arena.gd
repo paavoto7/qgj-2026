@@ -1,20 +1,19 @@
 extends Node2D
-## Combat arena. Circle enemies with your thread to knot them. Builds the player, thread, HUD and waves from code, spawning the exported enemy scenes.
+## Combat arena. Circle enemies with your thread to knot them. Builds the player, thread and HUD from code,
+## and spawns the exported waves, then random waves once they run out.
 
 const ARENA_MARGIN: float = 24.0
 const SPAWN_MARGIN: float = 40.0
 const SPAWN_MIN_DISTANCE: float = 260.0
 ## Seconds after a knot during which the next knot raises the combo.
 const COMBO_WINDOW: float = 3.0
-const MAX_RANDOM_ENEMIES: int = 6
-## Winds per enemy type in random waves. 0 means a linked pair.
-const RANDOM_TYPES: Array[int] = [2, -1, 1, -2, 0]
 
 @export var border_color: Color = Color(1.0, 1.0, 1.0, 0.25)
-## Enemy scenes with a ClockwiseType, CounterclockwiseType and PairedType component.
-@export var clockwise_scene: PackedScene
-@export var counterclockwise_scene: PackedScene
-@export var paired_scene: PackedScene
+## Scripted opening waves, played in order.
+@export var waves: Array[WaveData] = []
+## Enemy or group scenes that random waves pick from after the scripted waves.
+@export var random_enemies: Array[PackedScene] = []
+@export var max_random_enemies: int = 6
 
 var _arena: Rect2
 var _wave: int = 0
@@ -29,8 +28,8 @@ var _game_over: GameOverScreen
 
 
 func _ready() -> void:
-	if not clockwise_scene or not counterclockwise_scene or not paired_scene:
-		push_error("Arena needs all three enemy scenes assigned in the inspector.")
+	if random_enemies.is_empty():
+		push_error("Arena needs at least one scene in Random Enemies.")
 		set_physics_process(false)
 		return
 
@@ -83,11 +82,6 @@ func _process(_delta: float) -> void:
 
 func _draw() -> void:
 	draw_rect(_arena, border_color, false, 2.0)
-	for enemy: Enemy in _enemies:
-		var pair := enemy.type as PairedType
-		# Draw each pair link once
-		if pair and pair.has_partner() and pair.get_instance_id() < pair.partner.get_instance_id():
-			draw_dashed_line(enemy.position, pair.partner.enemy.position, Color(enemy.color, 0.5), 2.0, 8.0)
 
 
 func _check_knots() -> void:
@@ -122,57 +116,39 @@ func _hurt_player_on_contact() -> void:
 
 func _next_wave() -> void:
 	_wave += 1
-	for winds: int in _wave_types(_wave):
-		if winds == 0:
-			_spawn_pair()
-		else:
-			_spawn_enemy(_create_enemy(winds), _random_spawn_point())
+	for scene: PackedScene in _wave_scenes():
+		_spawn(scene)
 
 
-## The first waves teach one enemy type each, later ones mix them randomly.
-func _wave_types(wave: int) -> Array[int]:
-	match wave:
-		1:
-			return [2]
-		2:
-			return [2, -1]
-		3:
-			return [0]
+## The scripted waves in order, then random picks that grow with the wave number.
+func _wave_scenes() -> Array[PackedScene]:
+	var wave_data: WaveData = _current_wave_data()
+	if wave_data:
+		return wave_data.enemies
 
-	var types: Array[int] = []
-	for i: int in mini(wave - 1, MAX_RANDOM_ENEMIES):
-		types.append(RANDOM_TYPES.pick_random())
-	return types
+	var scenes: Array[PackedScene] = []
+	for i: int in mini(_wave - 1, max_random_enemies):
+		scenes.append(random_enemies.pick_random())
+	return scenes
 
 
-## Positive winds make a clockwise enemy, negative a counterclockwise one.
-func _create_enemy(winds: int) -> Enemy:
-	var enemy: Enemy = (clockwise_scene if winds > 0 else counterclockwise_scene).instantiate()
-	# Enemy.type is only set once the enemy is in the tree
-	var type: EnemyType = EnemyType.find_in(enemy)
-	if type is ClockwiseType:
-		(type as ClockwiseType).winds = winds
-	elif type is CounterclockwiseType:
-		(type as CounterclockwiseType).winds = -winds
-	return enemy
+func _current_wave_data() -> WaveData:
+	return waves[_wave - 1] if _wave <= waves.size() else null
 
 
-func _spawn_enemy(enemy: Enemy, spawn_position: Vector2) -> void:
-	enemy.position = spawn_position
-	enemy.target = _player
-	add_child(enemy)
-	_enemies.append(enemy)
+## Spawns every enemy in the scene around one random point, keeping a group's layout.
+func _spawn(scene: PackedScene) -> void:
+	var spawn_point: Vector2 = _random_spawn_point()
+	var group: Array[Enemy] = Enemy.take_from(scene.instantiate())
+	for enemy: Enemy in group:
+		enemy.position = (spawn_point + enemy.position).clamp(_arena.position, _arena.end)
+		enemy.target = _player
+		add_child(enemy)
+		_enemies.append(enemy)
 
-
-func _spawn_pair() -> void:
-	var first_position: Vector2 = _random_spawn_point()
-	var offset: Vector2 = Vector2.from_angle(randf() * TAU) * PairedType.PAIR_DISTANCE
-	var second_position: Vector2 = (first_position + offset).clamp(_arena.position, _arena.end)
-	var first: Enemy = paired_scene.instantiate()
-	var second: Enemy = paired_scene.instantiate()
-	_spawn_enemy(first, first_position)
-	_spawn_enemy(second, second_position)
-	PairedType.link(first.type as PairedType, second.type as PairedType)
+	for enemy: Enemy in group:
+		if is_instance_valid(enemy.type):
+			enemy.type.on_spawned(group)
 
 
 func _random_spawn_point() -> Vector2:
@@ -192,8 +168,9 @@ func _update_hud() -> void:
 	var text: String = "Wave %d    Score %d    HP %d" % [_wave, _score, _player.health.current_health]
 	if _combo > 1:
 		text += "    x%d combo!" % _combo
-	if _wave == 1:
-		text += "\nMove with WASD, the arrow keys or a stick. Wind your thread around enemies: the rings show how many loops, the arrow which way."
+	var wave_data: WaveData = _current_wave_data()
+	if wave_data and not wave_data.hint.is_empty():
+		text += "\n" + wave_data.hint
 	_hud.text = text
 
 

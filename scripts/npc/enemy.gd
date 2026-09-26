@@ -62,6 +62,24 @@ func _draw() -> void:
 		tip + Vector2(-direction * 3.0, 5.0),
 	]), color)
 
+	type.draw_extras()
+
+
+## Returns the enemies in a freshly instantiated scene: the root if it's an Enemy, otherwise its Enemy children.
+## Children are taken out of the group, keeping their position as an offset from it, and the group is freed.
+static func take_from(node: Node) -> Array[Enemy]:
+	var enemies: Array[Enemy] = []
+	if node is Enemy:
+		enemies.append(node)
+		return enemies
+
+	for child: Node in node.get_children():
+		if child is Enemy:
+			node.remove_child(child)
+			enemies.append(child)
+	node.free()
+	return enemies
+
 
 ## Updates the progress rings and returns true when the thread knots this enemy.
 ## [param windings] holds the thread's winding around every enemy in the arena.
