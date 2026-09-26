@@ -1,5 +1,5 @@
 extends Node2D
-## Winding combat arena. Circle enemies with your thread to knot them. Builds the player, thread, HUD and waves from code.
+## Combat arena. Circle enemies with your thread to knot them. Builds the player, thread, HUD and waves from code.
 
 const ARENA_MARGIN: float = 24.0
 const SPAWN_MARGIN: float = 40.0
@@ -18,7 +18,7 @@ var _score: int = 0
 var _combo: int = 0
 var _combo_timer: float = 0.0
 var _enemies: Array[KnotEnemy] = []
-var _player: WindingPlayer
+var _player: Player
 var _thread: ThreadTrail
 var _hud: Label
 var _game_over: GameOverScreen
@@ -30,7 +30,7 @@ func _ready() -> void:
 	_thread = ThreadTrail.new()
 	add_child(_thread)
 
-	_player = WindingPlayer.new()
+	_player = Player.new()
 	_player.arena = _arena
 	_player.position = _arena.get_center()
 	add_child(_player)

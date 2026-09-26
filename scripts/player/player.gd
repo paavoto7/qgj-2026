@@ -1,6 +1,6 @@
-class_name WindingPlayer
+class_name Player
 extends Node2D
-## Player for winding combat. Moves freely inside the arena, which records its path as the thread.
+## Player. Moves freely inside the arena, which records its path as the thread.
 
 @export var speed: float = 340.0
 @export var acceleration: float = 2400.0

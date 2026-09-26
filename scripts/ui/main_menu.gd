@@ -4,7 +4,7 @@ extends MenuBase
 
 @export var title: String = "Winding Combat"
 @export_multiline var subtitle: String = "Don't shoot. Wind your thread around enemies to knot them."
-@export_file("*.tscn") var game_scene: String = "res://scenes/winding/winding_arena.tscn"
+@export_file("*.tscn") var game_scene: String = "res://scenes/arena/arena.tscn"
 @export var title_font_size: int = 64
 @export var button_min_size: Vector2 = Vector2(240.0, 48.0)
 @export var click_sound: AudioStream
