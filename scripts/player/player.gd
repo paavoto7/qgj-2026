@@ -30,9 +30,10 @@ func _ready() -> void:
 		return
 
 	# Blink for as long as the player is invulnerable
-	_flash.flash_count = maxi(ceili(health.invulnerability_time / _flash.flash_duration), 1)
+	_flash.set_flash_count_by_health(health)
 	health.damaged.connect(_on_damaged)
 	health.died.connect(_on_died)
+	health.invulnerable_hit.connect(_on_invulnerable_hit)
 
 
 func _physics_process(delta: float) -> void:
@@ -58,3 +59,8 @@ func _on_damaged(_amount: int) -> void:
 func _on_died() -> void:
 	_flash.stop()
 	queue_redraw()
+
+
+func _on_invulnerable_hit() -> void:
+	#_flash.set_flash_count_by_health(health)
+	_flash.flash()

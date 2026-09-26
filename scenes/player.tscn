@@ -4,9 +4,12 @@
 [ext_resource type="Script" uid="uid://cbl2vokhsvr7r" path="res://scripts/components/health.gd" id="2_g2els"]
 [ext_resource type="Script" uid="uid://4bujyghpfksu" path="res://scripts/common/flash_effect.gd" id="3_qhqgy"]
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_qhqgy"]
+
 [node name="Player" type="Node2D" unique_id=207122893]
 script = ExtResource("1_3vyb7")
 speed = 600.0
+color = Color(1.4305458, 1.2207112, 0.58568555, 1)
 
 [node name="Health" type="Node" parent="." unique_id=961095829]
 script = ExtResource("2_g2els")
@@ -14,3 +17,9 @@ invulnerability_time = 1.0
 
 [node name="FlashEffect" type="Node" parent="." unique_id=1791987936]
 script = ExtResource("3_qhqgy")
+
+[node name="HitBox" type="Area2D" parent="." unique_id=990474254]
+collision_mask = 14
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox" unique_id=351864432]
+shape = SubResource("CircleShape2D_qhqgy")

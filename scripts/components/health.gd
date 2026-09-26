@@ -6,12 +6,14 @@ signal health_changed(current: int, maximum: int)
 signal damaged(amount: int)
 signal healed(amount: int)
 signal died
+signal invulnerable_hit
 
 @export var max_health: int = 100
 ## Seconds of invulnerability after taking damage. 0 disables it.
 @export var invulnerability_time: float = 0.0
 @export var hurt_sound: AudioStream
 @export var death_sound: AudioStream
+
 
 var current_health: int
 var is_dead: bool:
@@ -38,7 +40,13 @@ static func find_in(node: Node) -> Health:
 
 
 func take_damage(amount: int) -> void:
-	if amount <= 0 or is_dead or _is_invulnerable():
+	if amount <= 0 or is_dead:
+		return
+	
+	if _is_invulnerable():
+		invulnerable_hit.emit()
+		# invulnerability_flash.set_flash_count_by_health(self)
+		# invulnerability_flash.flash()
 		return
 
 	current_health = max(current_health - amount, 0)
