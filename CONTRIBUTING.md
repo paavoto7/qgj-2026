@@ -19,7 +19,7 @@ If problems arise, merge or rebase main to your branch. Ask for help if needed.
 ### Creating a branch
 1. Pull: `git pull origin main`
 2. Create a branch: `git branch [branch]`
-    - Or alternatively to create and checkout `git checkout -b [branch]`
+	- Or alternatively to create and checkout `git checkout -b [branch]`
 3. Change branch: `git checkout [branch]`
 
 ### After adding code/assets
@@ -37,8 +37,8 @@ If problems arise, merge or rebase main to your branch. Ask for help if needed.
 - Always commit the `.uid` and `.import` files together with their scripts and assets. Never commit `.godot/`.
 - Rename and move files in the Godot FileSystem dock, not in Explorer, so references get updated.
 - Never work on the same scene at the same time as someone else, scenes merge badly.
-    - Split things into their own scenes and edit those instead.
-    - For testing, make your own scene in `scenes/sandbox/[name]/`.
+	- Split things into their own scenes and edit those instead.
+	- For testing, make your own scene in `scenes/sandbox/[name]/`.
 - Mention changes to Project Settings (input actions, autoloads, layers) in your PR, they all end up in `project.godot`.
 
 ## Languages
@@ -91,22 +91,22 @@ using Godot;
 /// </summary>
 public partial class Example : Node3D
 {
-    [Export] private float speed = 1f;
+	[Export] private float speed = 1f;
 
-    public bool IsMoving { get; private set; }
+	public bool IsMoving { get; private set; }
 
-    public void Stop() => IsMoving = false;
+	public void Stop() => IsMoving = false;
 
-    public override void _PhysicsProcess(double delta)
-    {
-        if (IsMoving)
-        {
-            Translate(Vector3.Forward * speed * (float)delta);
-        }
-        else
-        {
-            // ...
-        }
-    }
+	public override void _PhysicsProcess(double delta)
+	{
+		if (IsMoving)
+		{
+			Translate(Vector3.Forward * speed * (float)delta);
+		}
+		else
+		{
+			// ...
+		}
+	}
 }
 ```

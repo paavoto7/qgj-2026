@@ -112,6 +112,14 @@ func _check_knots() -> void:
 	# Everything knotted by the same thread counts as one combo, then the thread is used up
 	for enemy: Enemy in knotted:
 		_enemies.erase(enemy)
+
+		var yellow_type := enemy.type as YellowType
+		if yellow_type:
+			for child: Enemy in yellow_type.split():
+				child.target = _player
+				add_child(child)
+				_enemies.append(child)
+
 		enemy.knot()
 		_combo += 1
 		_score += 100 * _combo
