@@ -6,6 +6,13 @@ extends Node
 ## It decides how the thread's winding counts, which way to wind and what colour the enemy is.
 ## Subclasses must be tool scripts too, so the enemy is drawn in the editor.
 
+## Set per type in the enemy's scene, on its Type node.
+@export var color: Color = Color.WHITE
+## How many winds knot the enemy. Also the number of rings drawn around it.
+@export var winds: int = 1
+## Which way to wind. Flips the rings and arrow too.
+@export var clockwise: bool = true
+
 var enemy: Enemy:
 	get:
 		return get_parent() as Enemy
@@ -25,16 +32,25 @@ static func find_in(node: Node) -> EnemyType:
 @abstract func wound_amount(windings: Dictionary[Enemy, float]) -> float
 
 
-@abstract func get_color() -> Color
+func get_color() -> Color:
+	return color
+
+
+func get_speed() -> float:
+	return enemy.speed
+
+
+func get_radius() -> float:
+	return enemy.radius
 
 
 func winds_needed() -> int:
-	return 1
+	return maxi(winds, 1)
 
 
 ## 1 for clockwise, -1 for counterclockwise.
 func direction() -> float:
-	return 1.0
+	return 1.0 if clockwise else -1.0
 
 
 ## Adjusts the enemy's velocity, which chases the target by default.

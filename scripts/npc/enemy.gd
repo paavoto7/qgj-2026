@@ -33,6 +33,10 @@ func _ready() -> void:
 	if not is_instance_valid(type):
 		push_error("Enemy '%s' needs an EnemyType child component." % name)
 		set_physics_process(false)
+		return
+		
+	speed = type.get_speed()
+	radius = type.get_radius()
 
 
 func _physics_process(delta: float) -> void:
