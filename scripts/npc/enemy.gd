@@ -1,8 +1,7 @@
-@abstract
 class_name Enemy
 extends Node2D
-## Base for enemies that die when the thread winds around them in the right pattern.
-## Subclasses decide how the winding counts and what colour they are. Positive winds are clockwise.
+## Enemy that dies when the thread winds around it in the right pattern.
+## Its EnemyType child component decides the pattern. Positive winds are clockwise.
 
 ## How much of a wind can be missing and still count. Keeps sloppy loops forgiving.
 const TOLERANCE: float = 0.15
@@ -15,15 +14,23 @@ var target: Node2D
 var is_knotted: bool = false
 var color: Color:
 	get:
-		return _get_color()
+		return type.get_color() if is_instance_valid(type) else Color.WHITE
 
 var _progress: float = 0.0
+
+@onready var type: EnemyType = EnemyType.find_in(self)
+
+
+func _ready() -> void:
+	if not is_instance_valid(type):
+		push_error("Enemy '%s' needs an EnemyType child component." % name)
+		set_physics_process(false)
 
 
 func _physics_process(delta: float) -> void:
 	if is_knotted or not is_instance_valid(target):
 		return
-	position += _get_velocity() * delta
+	position += type.steer(position.direction_to(target.position) * speed) * delta
 
 
 func _process(_delta: float) -> void:
@@ -33,10 +40,12 @@ func _process(_delta: float) -> void:
 func _draw() -> void:
 	draw_circle(Vector2.ZERO, radius, color.darkened(0.6))
 	draw_arc(Vector2.ZERO, radius, 0.0, TAU, 32, color, 2.0)
+	if not is_instance_valid(type):
+		return
 
 	# One ring per wind needed, filling up clockwise or counterclockwise from the top
-	var winds: int = _winds_needed()
-	var direction: float = _direction()
+	var winds: int = type.winds_needed()
+	var direction: float = type.direction()
 	var filled: float = _progress * winds
 	for i: int in winds:
 		var ring_radius: float = radius + 6.0 + i * RING_SPACING
@@ -57,8 +66,11 @@ func _draw() -> void:
 ## Updates the progress rings and returns true when the thread knots this enemy.
 ## [param windings] holds the thread's winding around every enemy in the arena.
 func evaluate(windings: Dictionary[Enemy, float]) -> bool:
-	var along: float = _wound_amount(windings)
-	var needed: float = _winds_needed()
+	if not is_instance_valid(type):
+		return false
+
+	var along: float = type.wound_amount(windings)
+	var needed: float = type.winds_needed()
 	_progress = clampf(along / needed, 0.0, 1.0)
 	return along >= needed - TOLERANCE
 
@@ -67,25 +79,5 @@ func knot() -> void:
 	is_knotted = true
 	var tween: Tween = create_tween().set_parallel()
 	tween.tween_property(self, "scale", Vector2.ZERO, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
-	tween.tween_property(self, "rotation", _direction() * TAU, 0.3)
+	tween.tween_property(self, "rotation", type.direction() * TAU, 0.3)
 	tween.chain().tween_callback(queue_free)
-
-
-## How many winds the thread has made around this enemy in the direction it needs.
-@abstract func _wound_amount(windings: Dictionary[Enemy, float]) -> float
-
-
-@abstract func _get_color() -> Color
-
-
-func _get_velocity() -> Vector2:
-	return position.direction_to(target.position) * speed
-
-
-func _winds_needed() -> int:
-	return 1
-
-
-## 1 for clockwise, -1 for counterclockwise.
-func _direction() -> float:
-	return 1.0

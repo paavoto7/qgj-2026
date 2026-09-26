@@ -1,6 +1,12 @@
 [gd_scene format=3 uid="uid://x1nbjrwv4iug"]
 
 [ext_resource type="Script" uid="uid://c2q0n1seeluhm" path="res://scripts/common/arena.gd" id="1_arena"]
+[ext_resource type="PackedScene" uid="uid://dnc8437p2n4uj" path="res://scenes/enemy/enemy_types/clockwise_enemy.tscn" id="2_aj7ud"]
+[ext_resource type="PackedScene" uid="uid://dn35743gscsgg" path="res://scenes/enemy/enemy_types/counterclockwise_enemy.tscn" id="3_asdgj"]
+[ext_resource type="PackedScene" uid="uid://crg0pf132u3fl" path="res://scenes/enemy/enemy_types/paired_enemy.tscn" id="4_jx0ua"]
 
 [node name="Arena" type="Node2D" unique_id=1972150469]
 script = ExtResource("1_arena")
+clockwise_scene = ExtResource("2_aj7ud")
+counterclockwise_scene = ExtResource("3_asdgj")
+paired_scene = ExtResource("4_jx0ua")

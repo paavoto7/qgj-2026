@@ -1,5 +1,5 @@
 extends Node2D
-## Combat arena. Circle enemies with your thread to knot them. Builds the player, thread, HUD and waves from code.
+## Combat arena. Circle enemies with your thread to knot them. Builds the player, thread, HUD and waves from code, spawning the exported enemy scenes.
 
 const ARENA_MARGIN: float = 24.0
 const SPAWN_MARGIN: float = 40.0
@@ -11,6 +11,10 @@ const MAX_RANDOM_ENEMIES: int = 6
 const RANDOM_TYPES: Array[int] = [2, -1, 1, -2, 0]
 
 @export var border_color: Color = Color(1.0, 1.0, 1.0, 0.25)
+## Enemy scenes with a ClockwiseType, CounterclockwiseType and PairedType component.
+@export var clockwise_scene: PackedScene
+@export var counterclockwise_scene: PackedScene
+@export var paired_scene: PackedScene
 
 var _arena: Rect2
 var _wave: int = 0
@@ -25,6 +29,11 @@ var _game_over: GameOverScreen
 
 
 func _ready() -> void:
+	if not clockwise_scene or not counterclockwise_scene or not paired_scene:
+		push_error("Arena needs all three enemy scenes assigned in the inspector.")
+		set_physics_process(false)
+		return
+
 	_arena = get_viewport_rect().grow(-ARENA_MARGIN)
 
 	_thread = ThreadTrail.new()
@@ -75,10 +84,10 @@ func _process(_delta: float) -> void:
 func _draw() -> void:
 	draw_rect(_arena, border_color, false, 2.0)
 	for enemy: Enemy in _enemies:
-		var pair := enemy as PairedEnemy
+		var pair := enemy.type as PairedType
 		# Draw each pair link once
 		if pair and pair.has_partner() and pair.get_instance_id() < pair.partner.get_instance_id():
-			draw_dashed_line(pair.position, pair.partner.position, Color(pair.color, 0.5), 2.0, 8.0)
+			draw_dashed_line(enemy.position, pair.partner.enemy.position, Color(enemy.color, 0.5), 2.0, 8.0)
 
 
 func _check_knots() -> void:
@@ -138,13 +147,14 @@ func _wave_types(wave: int) -> Array[int]:
 
 ## Positive winds make a clockwise enemy, negative a counterclockwise one.
 func _create_enemy(winds: int) -> Enemy:
-	if winds > 0:
-		var clockwise := ClockwiseEnemy.new()
-		clockwise.winds = winds
-		return clockwise
-	var counterclockwise := CounterclockwiseEnemy.new()
-	counterclockwise.winds = -winds
-	return counterclockwise
+	var enemy: Enemy = (clockwise_scene if winds > 0 else counterclockwise_scene).instantiate()
+	# Enemy.type is only set once the enemy is in the tree
+	var type: EnemyType = EnemyType.find_in(enemy)
+	if type is ClockwiseType:
+		(type as ClockwiseType).winds = winds
+	elif type is CounterclockwiseType:
+		(type as CounterclockwiseType).winds = -winds
+	return enemy
 
 
 func _spawn_enemy(enemy: Enemy, spawn_position: Vector2) -> void:
@@ -156,13 +166,13 @@ func _spawn_enemy(enemy: Enemy, spawn_position: Vector2) -> void:
 
 func _spawn_pair() -> void:
 	var first_position: Vector2 = _random_spawn_point()
-	var offset: Vector2 = Vector2.from_angle(randf() * TAU) * PairedEnemy.PAIR_DISTANCE
+	var offset: Vector2 = Vector2.from_angle(randf() * TAU) * PairedType.PAIR_DISTANCE
 	var second_position: Vector2 = (first_position + offset).clamp(_arena.position, _arena.end)
-	var first := PairedEnemy.new()
-	var second := PairedEnemy.new()
-	PairedEnemy.link(first, second)
+	var first: Enemy = paired_scene.instantiate()
+	var second: Enemy = paired_scene.instantiate()
 	_spawn_enemy(first, first_position)
 	_spawn_enemy(second, second_position)
+	PairedType.link(first.type as PairedType, second.type as PairedType)
 
 
 func _random_spawn_point() -> Vector2:

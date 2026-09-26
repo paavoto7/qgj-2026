@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://dn35743gscsgg"]
+
+[ext_resource type="PackedScene" uid="uid://dbietblxprcs" path="res://scenes/enemy/enemy.tscn" id="1_xeuus"]
+[ext_resource type="Script" uid="uid://bsra2dcmw78xa" path="res://scripts/npc/enemy_types/counterclockwise_type.gd" id="2_0mabj"]
+
+[node name="CounterclockwiseEnemy" unique_id=210352966 instance=ExtResource("1_xeuus")]
+
+[node name="Type" type="Node" parent="." index="0" unique_id=225506512]
+script = ExtResource("2_0mabj")

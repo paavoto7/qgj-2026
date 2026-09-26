@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dbietblxprcs"]
+
+[ext_resource type="Script" uid="uid://dd1gpi3dpyymg" path="res://scripts/npc/enemy.gd" id="1_4a83h"]
+
+[node name="Enemy" type="Node2D" unique_id=210352966]
+script = ExtResource("1_4a83h")
