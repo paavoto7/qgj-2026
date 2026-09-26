@@ -1,6 +1,8 @@
+@tool
 extends Node2D
 ## Combat arena. Circle enemies with your thread to knot them. Builds the thread and HUD from code,
 ## spawns the exported player scene, and plays the exported waves, then random waves once they run out.
+## A tool script so the border is drawn in the editor. Gameplay code is skipped there.
 
 const ARENA_MARGIN: float = 24.0
 const SPAWN_MARGIN: float = 40.0
@@ -29,6 +31,15 @@ var _game_over: GameOverScreen
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		var window_size := Vector2(
+			ProjectSettings.get_setting("display/window/size/viewport_width"),
+			ProjectSettings.get_setting("display/window/size/viewport_height")
+		)
+		_arena = Rect2(Vector2.ZERO, window_size).grow(-ARENA_MARGIN)
+		set_physics_process(false)
+		return
+
 	if not player_scene or random_enemies.is_empty():
 		push_error("Arena needs a Player Scene and at least one scene in Random Enemies.")
 		set_physics_process(false)

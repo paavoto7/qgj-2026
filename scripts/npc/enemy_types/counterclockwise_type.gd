@@ -1,3 +1,4 @@
+@tool
 class_name CounterclockwiseType
 extends EnemyType
 ## The enemy needs the thread wound counterclockwise around it a set number of times.
