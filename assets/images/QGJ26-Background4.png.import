@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://g27peoake2ax"
-path="res://.godot/imported/QGJ26-Background3.png-001fa55b1c88a4acc16e829878b5b413.ctex"
+uid="uid://dhek6t4t4nnhq"
+path="res://.godot/imported/QGJ26-Background4.png-424c02b0b15b4a3550b3a12c8cde3fce.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/QGJ26-Background3.png"
-dest_files=["res://.godot/imported/QGJ26-Background3.png-001fa55b1c88a4acc16e829878b5b413.ctex"]
+source_file="res://assets/images/QGJ26-Background4.png"
+dest_files=["res://.godot/imported/QGJ26-Background4.png-424c02b0b15b4a3550b3a12c8cde3fce.ctex"]
 
 [params]
 
