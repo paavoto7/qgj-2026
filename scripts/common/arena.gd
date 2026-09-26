@@ -1,6 +1,6 @@
 extends Node2D
-## Combat arena. Circle enemies with your thread to knot them. Builds the player, thread and HUD from code,
-## and spawns the exported waves, then random waves once they run out.
+## Combat arena. Circle enemies with your thread to knot them. Builds the thread and HUD from code,
+## spawns the exported player scene, and plays the exported waves, then random waves once they run out.
 
 const ARENA_MARGIN: float = 24.0
 const SPAWN_MARGIN: float = 40.0
@@ -9,6 +9,7 @@ const SPAWN_MIN_DISTANCE: float = 260.0
 const COMBO_WINDOW: float = 3.0
 
 @export var border_color: Color = Color(1.0, 1.0, 1.0, 0.25)
+@export var player_scene: PackedScene
 ## Scripted opening waves, played in order.
 @export var waves: Array[WaveData] = []
 ## Enemy or group scenes that random waves pick from after the scripted waves.
@@ -28,8 +29,8 @@ var _game_over: GameOverScreen
 
 
 func _ready() -> void:
-	if random_enemies.is_empty():
-		push_error("Arena needs at least one scene in Random Enemies.")
+	if not player_scene or random_enemies.is_empty():
+		push_error("Arena needs a Player Scene and at least one scene in Random Enemies.")
 		set_physics_process(false)
 		return
 
@@ -38,7 +39,7 @@ func _ready() -> void:
 	_thread = ThreadTrail.new()
 	add_child(_thread)
 
-	_player = Player.new()
+	_player = player_scene.instantiate()
 	_player.arena = _arena
 	_player.position = _arena.get_center()
 	add_child(_player)

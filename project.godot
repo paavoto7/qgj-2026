@@ -22,7 +22,7 @@ MainManager="*res://scripts/autoloads/main_manager.gd"
 
 [display]
 
-window/stretch/mode="canvas_items"
+window/stretch/mode="viewport"
 window/stretch/aspect="expand"
 
 [dotnet]

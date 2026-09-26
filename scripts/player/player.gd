@@ -1,35 +1,24 @@
 class_name Player
 extends Node2D
 ## Player. Moves freely inside the arena, which records its path as the thread.
+## Needs Health and FlashEffect children. Set max health and invulnerability time on the Health node.
 
 @export var speed: float = 340.0
 @export var acceleration: float = 2400.0
 @export var radius: float = 10.0
-@export var max_health: int = 3
 @export var color: Color = Color(1.0, 0.85, 0.4)
 @export var dead_color: Color = Color(0.4, 0.4, 0.4)
 
 var arena: Rect2
 var velocity: Vector2 = Vector2.ZERO
-var health: Health
 
-var _flash: FlashEffect
-
-
-func _init() -> void:
-	health = Health.new()
-	health.invulnerability_time = 1.0
-	add_child(health)
-
-	# Blink for as long as the player is invulnerable
-	_flash = FlashEffect.new()
-	_flash.flash_count = ceili(health.invulnerability_time / _flash.flash_duration)
-	add_child(_flash)
+@onready var health: Health = $Health
+@onready var _flash: FlashEffect = $FlashEffect
 
 
 func _ready() -> void:
-	health.max_health = max_health
-	health.reset()
+	# Blink for as long as the player is invulnerable
+	_flash.flash_count = maxi(ceili(health.invulnerability_time / _flash.flash_duration), 1)
 	health.damaged.connect(_on_damaged)
 	health.died.connect(_on_died)
 

@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://x1nbjrwv4iug"]
 
 [ext_resource type="Script" uid="uid://c2q0n1seeluhm" path="res://scripts/common/arena.gd" id="1_arena"]
+[ext_resource type="PackedScene" uid="uid://bsb4mqfrfa24x" path="res://scenes/player.tscn" id="2_6w4xk"]
 [ext_resource type="PackedScene" uid="uid://dnc8437p2n4uj" path="res://scenes/enemy/enemy_types/clockwise_enemy.tscn" id="2_aj7ud"]
 [ext_resource type="Script" uid="uid://cmfv7ooftmf26" path="res://scripts/waves/wave_data.gd" id="2_jx0ua"]
 [ext_resource type="PackedScene" uid="uid://dn35743gscsgg" path="res://scenes/enemy/enemy_types/counterclockwise_enemy.tscn" id="3_asdgj"]
@@ -11,5 +12,6 @@
 
 [node name="Arena" type="Node2D" unique_id=1972150469]
 script = ExtResource("1_arena")
+player_scene = ExtResource("2_6w4xk")
 waves = Array[ExtResource("2_jx0ua")]([ExtResource("3_u52cf"), ExtResource("4_u52cf"), ExtResource("5_ii07k")])
 random_enemies = Array[PackedScene]([ExtResource("2_aj7ud"), ExtResource("3_asdgj"), ExtResource("6_jx0ua")])
