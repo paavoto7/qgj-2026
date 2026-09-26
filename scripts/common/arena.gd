@@ -17,7 +17,7 @@ var _wave: int = 0
 var _score: int = 0
 var _combo: int = 0
 var _combo_timer: float = 0.0
-var _enemies: Array[KnotEnemy] = []
+var _enemies: Array[Enemy] = []
 var _player: Player
 var _thread: ThreadTrail
 var _hud: Label
@@ -74,28 +74,28 @@ func _process(_delta: float) -> void:
 
 func _draw() -> void:
 	draw_rect(_arena, border_color, false, 2.0)
-	for enemy: KnotEnemy in _enemies:
+	for enemy: Enemy in _enemies:
+		var pair := enemy as PairedEnemy
 		# Draw each pair link once
-		if enemy.has_partner() and enemy.get_instance_id() < enemy.partner.get_instance_id():
-			draw_dashed_line(enemy.position, enemy.partner.position, Color(enemy.color, 0.5), 2.0, 8.0)
+		if pair and pair.has_partner() and pair.get_instance_id() < pair.partner.get_instance_id():
+			draw_dashed_line(pair.position, pair.partner.position, Color(pair.color, 0.5), 2.0, 8.0)
 
 
 func _check_knots() -> void:
-	var windings: Dictionary[KnotEnemy, float] = {}
-	for enemy: KnotEnemy in _enemies:
+	var windings: Dictionary[Enemy, float] = {}
+	for enemy: Enemy in _enemies:
 		windings[enemy] = _thread.winding_around(enemy.position)
 
-	var knotted: Array[KnotEnemy] = []
-	for enemy: KnotEnemy in _enemies:
-		var partner_winding: float = windings.get(enemy.partner, 0.0) if enemy.has_partner() else 0.0
-		if enemy.evaluate(windings[enemy], partner_winding):
+	var knotted: Array[Enemy] = []
+	for enemy: Enemy in _enemies:
+		if enemy.evaluate(windings):
 			knotted.append(enemy)
 
 	if knotted.is_empty():
 		return
 
 	# Everything knotted by the same thread counts as one combo, then the thread is used up
-	for enemy: KnotEnemy in knotted:
+	for enemy: Enemy in knotted:
 		_enemies.erase(enemy)
 		enemy.knot()
 		_combo += 1
@@ -105,7 +105,7 @@ func _check_knots() -> void:
 
 
 func _hurt_player_on_contact() -> void:
-	for enemy: KnotEnemy in _enemies:
+	for enemy: Enemy in _enemies:
 		if enemy.position.distance_to(_player.position) < enemy.radius + _player.radius:
 			_player.health.take_damage(1)
 			return
@@ -117,7 +117,7 @@ func _next_wave() -> void:
 		if winds == 0:
 			_spawn_pair()
 		else:
-			_spawn_enemy(winds, _random_spawn_point())
+			_spawn_enemy(_create_enemy(winds), _random_spawn_point())
 
 
 ## The first waves teach one enemy type each, later ones mix them randomly.
@@ -136,24 +136,33 @@ func _wave_types(wave: int) -> Array[int]:
 	return types
 
 
-func _spawn_enemy(winds: int, spawn_position: Vector2) -> KnotEnemy:
-	var enemy := KnotEnemy.new()
-	enemy.required_winds = winds
+## Positive winds make a clockwise enemy, negative a counterclockwise one.
+func _create_enemy(winds: int) -> Enemy:
+	if winds > 0:
+		var clockwise := ClockwiseEnemy.new()
+		clockwise.winds = winds
+		return clockwise
+	var counterclockwise := CounterclockwiseEnemy.new()
+	counterclockwise.winds = -winds
+	return counterclockwise
+
+
+func _spawn_enemy(enemy: Enemy, spawn_position: Vector2) -> void:
 	enemy.position = spawn_position
 	enemy.target = _player
 	add_child(enemy)
 	_enemies.append(enemy)
-	return enemy
 
 
 func _spawn_pair() -> void:
 	var first_position: Vector2 = _random_spawn_point()
-	var offset: Vector2 = Vector2.from_angle(randf() * TAU) * KnotEnemy.PAIR_DISTANCE
+	var offset: Vector2 = Vector2.from_angle(randf() * TAU) * PairedEnemy.PAIR_DISTANCE
 	var second_position: Vector2 = (first_position + offset).clamp(_arena.position, _arena.end)
-	var first: KnotEnemy = _spawn_enemy(1, first_position)
-	var second: KnotEnemy = _spawn_enemy(1, second_position)
-	first.partner = second
-	second.partner = first
+	var first := PairedEnemy.new()
+	var second := PairedEnemy.new()
+	PairedEnemy.link(first, second)
+	_spawn_enemy(first, first_position)
+	_spawn_enemy(second, second_position)
 
 
 func _random_spawn_point() -> Vector2:

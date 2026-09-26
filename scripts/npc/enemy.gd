@@ -1,29 +1,21 @@
-class_name KnotEnemy
+@abstract
+class_name Enemy
 extends Node2D
-## Enemy that dies when the thread winds around it in the right pattern.
-## Positive winds are clockwise, negative counterclockwise. With a partner, one loop around both knots them.
+## Base for enemies that die when the thread winds around them in the right pattern.
+## Subclasses decide how the winding counts and what colour they are. Positive winds are clockwise.
 
-## How far apart linked partners try to stay.
-const PAIR_DISTANCE: float = 110.0
 ## How much of a wind can be missing and still count. Keeps sloppy loops forgiving.
 const TOLERANCE: float = 0.15
 const RING_SPACING: float = 5.0
 
-@export var required_winds: int = 2
 @export var speed: float = 55.0
 @export var radius: float = 16.0
-@export var clockwise_color: Color = Color(1.0, 0.4, 0.4)
-@export var counterclockwise_color: Color = Color(0.4, 0.7, 1.0)
-@export var pair_color: Color = Color(0.6, 1.0, 0.5)
 
-var partner: KnotEnemy
 var target: Node2D
 var is_knotted: bool = false
 var color: Color:
 	get:
-		if has_partner():
-			return pair_color
-		return clockwise_color if required_winds > 0 else counterclockwise_color
+		return _get_color()
 
 var _progress: float = 0.0
 
@@ -31,13 +23,7 @@ var _progress: float = 0.0
 func _physics_process(delta: float) -> void:
 	if is_knotted or not is_instance_valid(target):
 		return
-
-	var velocity: Vector2 = position.direction_to(target.position) * speed
-	if has_partner():
-		# Spring towards the partner so the pair stays loopable as one
-		var offset: Vector2 = partner.position - position
-		velocity += offset.normalized() * (offset.length() - PAIR_DISTANCE) * 2.0
-	position += velocity * delta
+	position += _get_velocity() * delta
 
 
 func _process(_delta: float) -> void:
@@ -68,20 +54,10 @@ func _draw() -> void:
 	]), color)
 
 
-## Partners always knot together, so a valid partner means this enemy is part of a pair.
-func has_partner() -> bool:
-	return is_instance_valid(partner)
-
-
 ## Updates the progress rings and returns true when the thread knots this enemy.
-func evaluate(winding: float, partner_winding: float) -> bool:
-	var along: float
-	if has_partner():
-		# Both must be wound the same way, so a loop around the pair counts but a figure eight doesn't
-		along = minf(absf(winding), absf(partner_winding)) if signf(winding) == signf(partner_winding) else 0.0
-	else:
-		along = winding * signf(required_winds)
-
+## [param windings] holds the thread's winding around every enemy in the arena.
+func evaluate(windings: Dictionary[Enemy, float]) -> bool:
+	var along: float = _wound_amount(windings)
 	var needed: float = _winds_needed()
 	_progress = clampf(along / needed, 0.0, 1.0)
 	return along >= needed - TOLERANCE
@@ -95,9 +71,21 @@ func knot() -> void:
 	tween.chain().tween_callback(queue_free)
 
 
+## How many winds the thread has made around this enemy in the direction it needs.
+@abstract func _wound_amount(windings: Dictionary[Enemy, float]) -> float
+
+
+@abstract func _get_color() -> Color
+
+
+func _get_velocity() -> Vector2:
+	return position.direction_to(target.position) * speed
+
+
 func _winds_needed() -> int:
-	return 1 if has_partner() else maxi(absi(required_winds), 1)
+	return 1
 
 
+## 1 for clockwise, -1 for counterclockwise.
 func _direction() -> float:
-	return -1.0 if required_winds < 0 and not has_partner() else 1.0
+	return 1.0
