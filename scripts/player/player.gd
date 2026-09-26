@@ -69,5 +69,4 @@ func _on_died() -> void:
 
 
 func _on_invulnerable_hit() -> void:
-	#_flash.set_flash_count_by_health(health)
 	_flash.flash()

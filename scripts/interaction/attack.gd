@@ -31,6 +31,17 @@ func try_attack(target: Node2D) -> bool:
 	return true
 
 
+## Damages the target's Health and knocks it back if it has a knockback(Vector2) method.
+## Shared by melee attacks and projectiles, so a hit works the same either way.
+static func apply_hit(target: Node, hit_damage: int, hit_knockback: Vector2) -> void:
+	var health: Health = Health.find_in(target)
+	if health:
+		health.take_damage(hit_damage)
+
+	if target.has_method("knockback"):
+		target.knockback(hit_knockback)
+
+
 func _on_attack(target: Node2D) -> void:
 	if is_melee:
 		# Melee attacks are instant, so apply the effect immediately
@@ -47,12 +58,7 @@ func _on_attack(target: Node2D) -> void:
 
 ## Applies the attack's effect to the target. Override to implement a different effect.
 func _apply_effect(target: Node2D) -> void:
-	var health: Health = Health.find_in(target)
-	if health:
-		health.take_damage(damage)
-
-	if target.has_method("knockback"):
-		target.knockback(knockback)
+	apply_hit(target, damage, knockback)
 
 
 func _now() -> float:

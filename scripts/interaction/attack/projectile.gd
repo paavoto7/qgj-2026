@@ -1,5 +1,6 @@
 @tool
-class_name Projectile extends Node2D
+class_name Projectile
+extends Node2D
 ## A projectile that moves in a straight line and damages the first target it hits.
 
 @export var speed: float = 400.0
@@ -12,7 +13,7 @@ class_name Projectile extends Node2D
 @export var trail_length: int = -1
 ## How sharply the trail fades towards its tail. 1 is linear, higher values fade faster.
 @export var trail_falloff: float = 4.0
-
+## How many colour stops the trail's fade gradient has. More stops give a smoother fade.
 @export var trail_gradient_steps: int = 8
 
 @onready var hitbox: Area2D = $HitBox
@@ -32,21 +33,6 @@ func _ready() -> void:
 	hitbox.area_entered.connect(_on_area_entered)
 
 
-func _on_area_entered(area: Area2D) -> void:
-	var target: Node2D = area.get_parent() as Node2D
-	if not target:
-		return
-
-	var health: Health = Health.find_in(target)
-	if health:
-		health.take_damage(damage)
-
-	if target.has_method("knockback"):
-		target.knockback(knockback)
-
-	queue_free()
-
-
 func _physics_process(delta: float) -> void:
 	position += transform.x * speed * delta
 	trail.add_point(global_position)
@@ -57,8 +43,18 @@ func _physics_process(delta: float) -> void:
 		if lifetime <= 0.0:
 			queue_free()
 
+
 func _draw() -> void:
 	draw_circle(Vector2.ZERO, 4.0, colour)
+
+
+func _on_area_entered(area: Area2D) -> void:
+	var target: Node2D = area.get_parent() as Node2D
+	if not target:
+		return
+
+	Attack.apply_hit(target, damage, knockback)
+	queue_free()
 
 
 ## Line2D gradients run from the first (oldest) point to the last (newest) one,

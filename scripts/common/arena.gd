@@ -8,7 +8,10 @@ extends Node2D
 ## Margin used in the editor when no Arena Data is assigned.
 const DEFAULT_MARGIN: float = 24.0
 
-@export var arena_data: ArenaData
+@export var arena_data: ArenaData:
+	set(value):
+		arena_data = value
+		queue_redraw()
 
 var _arena: Rect2
 var _player: Player
@@ -27,6 +30,7 @@ func _ready() -> void:
 		var margin: float = arena_data.arena_margin if arena_data else DEFAULT_MARGIN
 		_arena = Rect2(Vector2.ZERO, window_size).grow(-margin)
 		set_physics_process(false)
+		queue_redraw()
 		return
 
 	if not arena_data:
@@ -40,6 +44,8 @@ func _ready() -> void:
 		return
 
 	_arena = get_viewport_rect().grow(-arena_data.arena_margin)
+	# The border never changes, so it's drawn once
+	queue_redraw()
 
 	_player = arena_data.player_scene.instantiate()
 	_player.arena = _arena
@@ -65,10 +71,6 @@ func _physics_process(_delta: float) -> void:
 
 	if _spawner.enemies.is_empty():
 		_spawner.next_wave()
-
-
-func _process(_delta: float) -> void:
-	queue_redraw()
 
 
 func _draw() -> void:
