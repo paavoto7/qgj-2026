@@ -6,6 +6,7 @@ signal health_changed(current: int, maximum: int)
 signal damaged(amount: int)
 signal healed(amount: int)
 signal died
+signal invulnerable_hit
 
 @export var max_health: int = 100
 ## Seconds of invulnerability after taking damage. 0 disables it.
@@ -23,6 +24,7 @@ var _invulnerable_until: float = 0.0
 
 func _ready() -> void:
 	current_health = max_health
+	health_changed.emit(current_health, max_health)
 
 
 ## Returns the first Health child of node, or null. Use it to find the Health of a body that entered an area.
@@ -38,7 +40,11 @@ static func find_in(node: Node) -> Health:
 
 
 func take_damage(amount: int) -> void:
-	if amount <= 0 or is_dead or _is_invulnerable():
+	if amount <= 0 or is_dead:
+		return
+
+	if _is_invulnerable():
+		invulnerable_hit.emit()
 		return
 
 	current_health = max(current_health - amount, 0)

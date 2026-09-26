@@ -11,6 +11,8 @@ const RING_SPACING: float = 5.0
 
 @export var speed: float = 55.0
 @export var radius: float = 16.0
+## Used on the target once it's within the attack's range of the enemy's edge. None means harmless.
+@export var attack: Attack = null
 
 var target: Node2D
 var is_knotted: bool = false
@@ -45,6 +47,7 @@ func _physics_process(delta: float) -> void:
 	if is_knotted or not is_instance_valid(target):
 		return
 	position += type.steer(position.direction_to(target.position) * speed) * delta
+	_attack_in_range()
 
 
 func _process(_delta: float) -> void:
@@ -145,3 +148,8 @@ func knot() -> void:
 	tween.tween_property(self, "scale", Vector2.ZERO, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
 	tween.tween_property(self, "rotation", type.direction() * TAU, 0.3)
 	tween.chain().tween_callback(queue_free)
+
+
+func _attack_in_range() -> void:
+	if is_instance_valid(attack) and position.distance_to(target.position) <= radius + attack.attack_range:
+		attack.try_attack(target)

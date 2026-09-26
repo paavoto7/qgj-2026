@@ -10,6 +10,11 @@ extends Node2D
 var points: PackedVector2Array = PackedVector2Array()
 
 
+func _ready() -> void:
+	top_level = true
+	global_transform = Transform2D.IDENTITY
+
+
 func _draw() -> void:
 	if points.size() < 2:
 		return
@@ -27,6 +32,7 @@ func add_point(point: Vector2) -> void:
 		return
 
 	points.append(point)
+	# This is not optimal, but the line is short and time available even shorter.
 	if points.size() > max_points:
 		points.remove_at(0)
 	queue_redraw()
