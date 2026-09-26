@@ -27,4 +27,4 @@ script = ExtResource("4_aj7ud")
 script = ExtResource("5_asdgj")
 
 [node name="TileMap" parent="." unique_id=441692976 instance=ExtResource("12_vmsrg")]
-enabled = false
+z_index = -1
