@@ -25,6 +25,7 @@ var _invulnerable_until: float = 0.0
 
 func _ready() -> void:
 	current_health = max_health
+	health_changed.emit(current_health, max_health)
 
 
 ## Returns the first Health child of node, or null. Use it to find the Health of a body that entered an area.
