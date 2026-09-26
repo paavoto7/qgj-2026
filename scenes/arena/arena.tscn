@@ -11,9 +11,12 @@
 [ext_resource type="PackedScene" uid="uid://b54y77jo58ion" path="res://scenes/enemy/enemy_types/enemy_pair.tscn" id="6_jx0ua"]
 [ext_resource type="Resource" uid="uid://lt2o3dka8cmr" path="res://resources/waves/testwave.tres" id="7_xgbxb"]
 [ext_resource type="PackedScene" uid="uid://ductckbu25n13" path="res://scenes/enemy/enemy_types/fast_small_enemy.tscn" id="11_vmsrg"]
+[ext_resource type="PackedScene" uid="uid://w51tbsutbwgl" path="res://scenes/Tilemap.tscn" id="12_vmsrg"]
 
 [node name="Arena" type="Node2D" unique_id=1972150469]
 script = ExtResource("1_arena")
 player_scene = ExtResource("2_6w4xk")
 waves = Array[ExtResource("2_jx0ua")]([ExtResource("7_xgbxb"), ExtResource("3_u52cf"), ExtResource("4_u52cf"), ExtResource("5_ii07k")])
 random_enemies = Array[PackedScene]([ExtResource("2_aj7ud"), ExtResource("3_asdgj"), ExtResource("6_jx0ua"), ExtResource("11_vmsrg")])
+
+[node name="TileMap" parent="." unique_id=441692976 instance=ExtResource("12_vmsrg")]
