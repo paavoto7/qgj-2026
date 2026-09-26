@@ -5,6 +5,7 @@ Game for Quantum Game Jam 2026.
 - Getting started and commit workflow: [CONTRIBUTING.md](CONTRIBUTING.md).
 - Setting up the project at jam start: [docs/JAM_START.md](docs/JAM_START.md).
 - Adding enemies and waves: [docs/ENEMIES_AND_WAVES.md](docs/ENEMIES_AND_WAVES.md).
+- Planned enemy type cleanup: [docs/ENEMY_TYPE_CLEANUP_PLAN.md](docs/ENEMY_TYPE_CLEANUP_PLAN.md).
 
 ## Theme
 The theme of the year is *quantum braiding*.

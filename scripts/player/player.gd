@@ -1,7 +1,7 @@
 @tool
 class_name Player
 extends Node2D
-## Player. Moves freely inside the arena, which records its path as the thread.
+## Player. Moves freely inside the arena and leaves its path behind as the thread.
 ## Needs Health and FlashEffect children. Set max health and invulnerability time on the Health node.
 ## A tool script so it's drawn in the editor. Gameplay code is skipped there.
 
@@ -19,6 +19,7 @@ extends Node2D
 
 var arena: Rect2
 var velocity: Vector2 = Vector2.ZERO
+var thread: ThreadTrail
 
 @onready var health: Health = $Health
 @onready var _flash: FlashEffect = $FlashEffect
@@ -35,11 +36,15 @@ func _ready() -> void:
 	health.died.connect(_on_died)
 	health.invulnerable_hit.connect(_on_invulnerable_hit)
 
+	thread = ThreadTrail.new()
+	add_child(thread)
+
 
 func _physics_process(delta: float) -> void:
 	if health.is_dead:
 		return
 
+	thread.add_point(position)
 	var input: Vector2 = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
 	velocity = velocity.move_toward(input * speed, acceleration * delta)
 	position += velocity * delta
@@ -53,6 +58,8 @@ func _draw() -> void:
 
 
 func _on_damaged(_amount: int) -> void:
+	# A hit snaps the thread
+	thread.clear()
 	_flash.flash()
 
 
@@ -62,5 +69,4 @@ func _on_died() -> void:
 
 
 func _on_invulnerable_hit() -> void:
-	#_flash.set_flash_count_by_health(health)
 	_flash.flash()

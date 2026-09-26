@@ -14,7 +14,6 @@ signal invulnerable_hit
 @export var hurt_sound: AudioStream
 @export var death_sound: AudioStream
 
-
 var current_health: int
 var is_dead: bool:
 	get:
@@ -25,6 +24,7 @@ var _invulnerable_until: float = 0.0
 
 func _ready() -> void:
 	current_health = max_health
+	health_changed.emit(current_health, max_health)
 
 
 ## Returns the first Health child of node, or null. Use it to find the Health of a body that entered an area.
@@ -42,11 +42,9 @@ static func find_in(node: Node) -> Health:
 func take_damage(amount: int) -> void:
 	if amount <= 0 or is_dead:
 		return
-	
+
 	if _is_invulnerable():
 		invulnerable_hit.emit()
-		# invulnerability_flash.set_flash_count_by_health(self)
-		# invulnerability_flash.flash()
 		return
 
 	current_health = max(current_health - amount, 0)

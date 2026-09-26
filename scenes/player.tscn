@@ -13,6 +13,7 @@ color = Color(1.4305458, 1.2207112, 0.58568555, 1)
 
 [node name="Health" type="Node" parent="." unique_id=961095829]
 script = ExtResource("2_g2els")
+max_health = 3
 invulnerability_time = 1.0
 
 [node name="FlashEffect" type="Node" parent="." unique_id=1791987936]
