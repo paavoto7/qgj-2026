@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="Droppable" format=3 uid="uid://d4bl4bg04nugk"]
+
+[ext_resource type="PackedScene" uid="uid://iwxodhqojnip" path="res://scenes/item/shield_powerup.tscn" id="1_bujex"]
+[ext_resource type="Script" uid="uid://bsl8prbvi26dl" path="res://scripts/resources/items/droppable.gd" id="2_xegk5"]
+
+[resource]
+script = ExtResource("2_xegk5")
+item_scene = ExtResource("1_bujex")
+metadata/_custom_type_script = "uid://bsl8prbvi26dl"

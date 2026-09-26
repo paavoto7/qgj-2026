@@ -75,6 +75,11 @@ func kill() -> void:
 	take_damage(current_health)
 
 
+## Ignores damage for the given seconds, e.g. for a shield. Never shortens invulnerability that lasts longer.
+func make_invulnerable(seconds: float) -> void:
+	_invulnerable_until = maxf(_invulnerable_until, _now() + seconds)
+
+
 ## Brings a dead or damaged character back to full health.
 func reset() -> void:
 	current_health = max_health

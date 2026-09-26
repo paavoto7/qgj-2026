@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="Droppable" format=3 uid="uid://gicm7ym1jqct"]
+
+[ext_resource type="Script" uid="uid://bsl8prbvi26dl" path="res://scripts/resources/items/droppable.gd" id="1_1ap74"]
+[ext_resource type="PackedScene" uid="uid://c2hx4r1becw8o" path="res://scenes/item/heal_powerup.tscn" id="1_u6gpw"]
+
+[resource]
+script = ExtResource("1_1ap74")
+item_scene = ExtResource("1_u6gpw")
+metadata/_custom_type_script = "uid://bsl8prbvi26dl"

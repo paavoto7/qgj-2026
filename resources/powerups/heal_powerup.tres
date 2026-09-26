@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="HealPowerup" format=3 uid="uid://u42ne8kelbv5"]
+
+[ext_resource type="Script" uid="uid://cjld3v6rbqhe0" path="res://scripts/resources/items/powerups/heal_powerup.gd" id="1_8ncm3"]
+[ext_resource type="Texture2D" uid="uid://byi5xu27wekf8" path="res://icon.svg" id="2_s8tip"]
+
+[resource]
+script = ExtResource("1_8ncm3")
+sprite = ExtResource("2_s8tip")
+color = Color(0.12357568, 0.6130212, 0, 1)
+metadata/_custom_type_script = "uid://cjld3v6rbqhe0"

@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://c2hx4r1becw8o"]
+
+[ext_resource type="PackedScene" uid="uid://cwt3tcnst1wfk" path="res://scenes/item/powerup.tscn" id="1_38xpw"]
+[ext_resource type="Resource" uid="uid://u42ne8kelbv5" path="res://resources/powerups/heal_powerup.tres" id="2_dkadg"]
+
+[node name="HealPowerup" unique_id=1113621393 instance=ExtResource("1_38xpw")]
+
+[node name="Powerup" parent="." index="2" unique_id=1380200468]
+powerup_data = ExtResource("2_dkadg")

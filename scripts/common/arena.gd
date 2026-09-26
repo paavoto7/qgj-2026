@@ -63,6 +63,7 @@ func _ready() -> void:
 
 	_spawner.setup(arena_data, _arena, _player)
 	_spawner.wave_started.connect(_hud.show_wave)
+	_spawner.item_dropped.connect(_on_item_dropped)
 	_spawner.next_wave()
 
 
@@ -100,6 +101,11 @@ func _check_knots() -> void:
 		enemy.knot()
 	_score_keeper.add_knots(knotted.size())
 	_player.thread.clear()
+
+
+func _on_item_dropped(item: Node2D) -> void:
+	item.position = item.position.clamp(_arena.position, _arena.end)
+	add_child(item)
 
 
 func _on_player_damaged(_amount: int) -> void:

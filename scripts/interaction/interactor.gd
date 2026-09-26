@@ -1,6 +1,7 @@
 class_name Interactor
 extends Node
 ## Finds Interactables that overlap the parent Area2D or Area3D and interacts with the closest one on the interact input action.
+## Interactables with interact_on_touch are interacted with as soon as they overlap and are never focused.
 ##
 ## Connect focus_changed to the HUD to show or hide an interaction prompt.
 
@@ -26,6 +27,9 @@ func _ready() -> void:
 	if owner_node == null:
 		owner_node = _area.get_parent()
 
+	# Touch interactions still work without the input action
+	set_process_unhandled_input(InputMap.has_action(interact_action))
+
 	_area.area_entered.connect(_on_area_entered)
 	_area.area_exited.connect(_on_area_exited)
 
@@ -46,7 +50,15 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _on_area_entered(area: Node) -> void:
 	var interactable: Interactable = Interactable.find_in(area)
-	if interactable != null and interactable not in _in_range:
+	if interactable == null:
+		return
+
+	if interactable.interact_on_touch:
+		if interactable.enabled:
+			interactable.interact(owner_node)
+		return
+
+	if interactable not in _in_range:
 		_in_range.append(interactable)
 
 

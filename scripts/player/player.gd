@@ -3,6 +3,7 @@ class_name Player
 extends Node2D
 ## Player. Moves freely inside the arena and leaves its path behind as the thread.
 ## Needs Health and FlashEffect children. Set max health and invulnerability time on the Health node.
+## To collect items it needs an Interactor under its HitBox, and a Powerups child for powerups.
 ## A tool script so it's drawn in the editor. Gameplay code is skipped there.
 
 @export var speed: float = 340.0
@@ -22,6 +23,7 @@ var velocity: Vector2 = Vector2.ZERO
 var thread: ThreadTrail
 
 @onready var health: Health = $Health
+@onready var powerups: Powerups = Powerups.find_in(self)
 @onready var _flash: FlashEffect = $FlashEffect
 
 
@@ -65,6 +67,8 @@ func _on_damaged(_amount: int) -> void:
 
 func _on_died() -> void:
 	_flash.stop()
+	if is_instance_valid(powerups):
+		powerups.clear()
 	queue_redraw()
 
 

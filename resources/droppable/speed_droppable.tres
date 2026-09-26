@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="Droppable" format=3 uid="uid://b26ro8iw5hty6"]
+
+[ext_resource type="PackedScene" uid="uid://c4qivy7uqsr7d" path="res://scenes/item/speed_powerup.tscn" id="1_h3p0u"]
+[ext_resource type="Script" uid="uid://bsl8prbvi26dl" path="res://scripts/resources/items/droppable.gd" id="2_suenk"]
+
+[resource]
+script = ExtResource("2_suenk")
+item_scene = ExtResource("1_h3p0u")
+metadata/_custom_type_script = "uid://bsl8prbvi26dl"

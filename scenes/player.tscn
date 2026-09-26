@@ -3,6 +3,8 @@
 [ext_resource type="Script" uid="uid://cxkrp3d8qiwq4" path="res://scripts/player/player.gd" id="1_3vyb7"]
 [ext_resource type="Script" uid="uid://cbl2vokhsvr7r" path="res://scripts/components/health.gd" id="2_g2els"]
 [ext_resource type="Script" uid="uid://4bujyghpfksu" path="res://scripts/common/flash_effect.gd" id="3_qhqgy"]
+[ext_resource type="Script" uid="uid://d8usrr6xb4a0" path="res://scripts/interaction/interactor.gd" id="4_dqkch"]
+[ext_resource type="Script" uid="uid://c485oxdogl6hr" path="res://scripts/components/powerups.gd" id="5_qlg0r"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_qhqgy"]
 
@@ -24,3 +26,11 @@ collision_mask = 14
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox" unique_id=351864432]
 shape = SubResource("CircleShape2D_qhqgy")
+
+[node name="Interactor" type="Node" parent="HitBox" unique_id=650435596]
+script = ExtResource("4_dqkch")
+metadata/_custom_type_script = "uid://d8usrr6xb4a0"
+
+[node name="Powerups" type="Node" parent="." unique_id=1790225611]
+script = ExtResource("5_qlg0r")
+metadata/_custom_type_script = "uid://c485oxdogl6hr"

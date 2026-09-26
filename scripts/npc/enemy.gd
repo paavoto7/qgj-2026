@@ -7,6 +7,8 @@ extends Node2D
 
 ## Emitted when this enemy creates a new one, e.g. by splitting. Whoever owns the enemies adds it to the scene.
 signal spawned(new_enemy: Enemy)
+## Emitted when this enemy drops an item, not yet in the tree. Whoever owns the enemies adds it to the scene.
+signal dropped(item: Node2D)
 
 ## How much of a wind can be missing and still count. Keeps sloppy loops forgiving.
 const TOLERANCE: float = 0.15
@@ -16,6 +18,8 @@ const RING_SPACING: float = 5.0
 @export var radius: float = 16.0
 ## Used on the target once it's within the attack's range of the enemy's edge. None means harmless.
 @export var attack: Attack = null
+## What the enemy can drop when it's knotted. None means it drops nothing.
+@export var drop_table: DropTable = null
 
 var target: Node2D
 var is_knotted: bool = false
@@ -149,6 +153,7 @@ func knot() -> void:
 	is_knotted = true
 	if is_instance_valid(type):
 		type.on_knotted()
+	_drop_item()
 
 	var tween: Tween = create_tween().set_parallel()
 	tween.tween_property(self, "scale", Vector2.ZERO, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
@@ -165,3 +170,22 @@ func spawn(new_enemy: Enemy) -> void:
 func _attack_in_range() -> void:
 	if is_instance_valid(attack) and position.distance_to(target.position) <= radius + attack.attack_range:
 		attack.try_attack(target)
+
+
+func _drop_item() -> void:
+	if not drop_table:
+		return
+
+	var scene: PackedScene = drop_table.roll()
+	if not scene:
+		return
+
+	var instance: Node = scene.instantiate()
+	var item: Node2D = instance as Node2D
+	if not item:
+		instance.free()
+		push_error("Enemy '%s' drop scene '%s' needs a Node2D root." % [name, scene.resource_path])
+		return
+
+	item.position = position
+	dropped.emit(item)
