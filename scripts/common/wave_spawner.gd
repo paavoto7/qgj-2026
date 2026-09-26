@@ -4,6 +4,8 @@ extends Node2D
 ## Spawned enemies become children of this node. Call setup() before next_wave().
 
 signal wave_started(wave_data: WaveData, number: int)
+## Forwards an enemy's dropped item, not yet in the tree.
+signal item_dropped(item: Node2D)
 
 var enemies: Array[Enemy] = []
 
@@ -26,12 +28,14 @@ func next_wave() -> void:
 	wave_started.emit(_current_wave_data(), _wave)
 
 
-## Adds an enemy to the arena and tracks it. Enemies it spawns, e.g. by splitting, are added too.
+## Adds an enemy to the arena and tracks it. Enemies it spawns, e.g. by splitting, are added too,
+## and items it drops are passed on through item_dropped.
 func add_enemy(enemy: Enemy) -> void:
 	enemy.target = _target
 	add_child(enemy)
 	enemies.append(enemy)
 	enemy.spawned.connect(add_enemy)
+	enemy.dropped.connect(item_dropped.emit)
 
 
 ## The scripted waves in order, then random picks that grow with the wave number.

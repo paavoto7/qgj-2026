@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ShieldPowerup" format=3 uid="uid://c117gslb6i67y"]
+
+[ext_resource type="Script" uid="uid://dokv706aokv8v" path="res://scripts/resources/items/powerups/shield_powerup.gd" id="1_6yylf"]
+[ext_resource type="Texture2D" uid="uid://byi5xu27wekf8" path="res://icon.svg" id="2_bkov2"]
+
+[resource]
+script = ExtResource("1_6yylf")
+sprite = ExtResource("2_bkov2")
+color = Color(0, 0.3836452, 0.96761125, 1)
+metadata/_custom_type_script = "uid://dokv706aokv8v"

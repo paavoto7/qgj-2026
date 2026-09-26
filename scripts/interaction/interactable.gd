@@ -11,6 +11,8 @@ signal interacted(interactor: Node)
 @export var enabled: bool = true
 ## Disable after the first interaction, e.g. for pickups.
 @export var one_shot: bool = false
+## Interact as soon as an Interactor overlaps it, without the interact action, e.g. for pickups.
+@export var interact_on_touch: bool = false
 
 var area: Node:
 	get:

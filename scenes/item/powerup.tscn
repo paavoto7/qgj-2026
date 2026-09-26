@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://cwt3tcnst1wfk"]
+
+[ext_resource type="Script" uid="uid://s2scgyvsgnc1" path="res://scripts/interaction/item/powerup.gd" id="1_yvd7c"]
+[ext_resource type="Script" uid="uid://bgkiy3uc7miih" path="res://scripts/common/hover_effect.gd" id="2_oc8oe"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_88wdl"]
+
+[node name="Powerup" type="Area2D" unique_id=1113621393]
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=486654491]
+shape = SubResource("CircleShape2D_88wdl")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1811604899]
+
+[node name="Powerup" type="Node" parent="." unique_id=1380200468]
+script = ExtResource("1_yvd7c")
+
+[node name="HoverEffect" type="Node" parent="." unique_id=1989996424]
+script = ExtResource("2_oc8oe")
+metadata/_custom_type_script = "uid://bgkiy3uc7miih"

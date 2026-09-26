@@ -5,6 +5,7 @@ Game for Quantum Game Jam 2026.
 - Getting started and commit workflow: [CONTRIBUTING.md](CONTRIBUTING.md).
 - Setting up the project at jam start: [docs/JAM_START.md](docs/JAM_START.md).
 - Adding enemies and waves: [docs/ENEMIES_AND_WAVES.md](docs/ENEMIES_AND_WAVES.md).
+- Items, powerups and drop chances: [docs/ITEMS_AND_POWERUPS.md](docs/ITEMS_AND_POWERUPS.md).
 - Planned enemy type cleanup: [docs/ENEMY_TYPE_CLEANUP_PLAN.md](docs/ENEMY_TYPE_CLEANUP_PLAN.md).
 
 ## Theme
@@ -22,7 +23,11 @@ Reusable scripts under `scripts/`, taken from our GGJ 2026 project and cleaned u
 | `ui/menu_base.gd` | Base for menus. Shows the cursor while open, works while paused and focuses a control for controller navigation. |
 | `components/health.gd` | `Health` child node with damage, healing, invulnerability frames, sounds and signals. |
 | `components/damage_zone.gd` | Child of an `Area2D`/`Area3D`. Damages bodies with a `Health`, once or repeatedly. |
-| `interaction/interactable.gd` | Child of an `Area2D`/`Area3D`. Emits `interacted` or can be extended by overriding `interact()`. |
-| `interaction/interactor.gd` | Child of the player's `Area2D`/`Area3D`. Focuses the closest `Interactable` and interacts on the `interact` action. Connect `focus_changed` to the HUD. |
+| `interaction/interactable.gd` | Child of an `Area2D`/`Area3D`. Emits `interacted` or can be extended by overriding `interact()`. `interact_on_touch` makes it trigger on overlap, e.g. for pickups. |
+| `interaction/interactor.gd` | Child of the player's `Area2D`/`Area3D`. Focuses the closest `Interactable` and interacts on the `interact` action, or right away for touch interactables. Connect `focus_changed` to the HUD. |
+| `interaction/Item/item.gd`, `powerup.gd` | `Item` is an `Interactable` pickup collected on touch, with an optional lifetime. Extend it and override `_on_collected()`. `Powerup` gives the player a `PowerupData`. |
+| `components/powerups.gd` | `Powerups` child of the player. Applies powerups, times out timed ones and refreshes a powerup picked up again. |
+| `resources/items/drop_table.gd`, `droppable.gd` | Per-enemy `DropTable` (drop chance + `Droppable` item scenes weighted by rarity), assigned to an Enemy's *Drop Table*. |
+| `resources/items/powerup_data.gd` | Base for powerups. Extend it and implement `apply()` and, if timed, `remove()`. Examples in `resources/items/powerups/`. |
 | `common/flash_effect.gd` | Flashes the parent sprite or mesh, e.g. on damage. |
 | `common/hover_effect.gd` | Bobs the parent up and down, e.g. for pickups. |
