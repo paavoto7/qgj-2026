@@ -71,3 +71,5 @@ ui_down={
 [rendering]
 
 rendering_device/driver.windows="d3d12"
+viewport/hdr_2d=true
+environment/defaults/default_clear_color=Color(0.08136954, 0.08136954, 0.12675999, 1)

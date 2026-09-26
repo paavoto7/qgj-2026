@@ -77,7 +77,6 @@ func _physics_process(delta: float) -> void:
 
 	_thread.add_point(_player.position)
 	_check_knots()
-	_hurt_player_on_contact()
 
 	_combo_timer -= delta
 	if _combo_timer <= 0.0:
@@ -117,13 +116,6 @@ func _check_knots() -> void:
 		_score += 100 * _combo
 	_combo_timer = COMBO_WINDOW
 	_thread.clear()
-
-
-func _hurt_player_on_contact() -> void:
-	for enemy: Enemy in _enemies:
-		if enemy.position.distance_to(_player.position) < enemy.radius + _player.radius:
-			_player.health.take_damage(1)
-			return
 
 
 func _next_wave() -> void:

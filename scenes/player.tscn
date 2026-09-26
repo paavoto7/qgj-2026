@@ -7,6 +7,7 @@
 [node name="Player" type="Node2D" unique_id=207122893]
 script = ExtResource("1_3vyb7")
 speed = 600.0
+color = Color(1.4305458, 1.2207112, 0.58568555, 1)
 
 [node name="Health" type="Node" parent="." unique_id=961095829]
 script = ExtResource("2_g2els")
