@@ -19,6 +19,8 @@ var color: Color:
 		return type.get_color() if is_instance_valid(type) else Color.WHITE
 
 var _progress: float = 0.0
+var _completed_winds: int = 0
+var _thread_completed_winds: int = 0
 
 @onready var type: EnemyType = EnemyType.find_in(self)
 
@@ -34,7 +36,7 @@ func _ready() -> void:
 		push_error("Enemy '%s' needs an EnemyType child component." % name)
 		set_physics_process(false)
 		return
-		
+
 	speed = type.get_speed()
 	radius = type.get_radius()
 
@@ -55,30 +57,44 @@ func _draw() -> void:
 	if not is_instance_valid(type):
 		return
 
-	# One ring per wind needed, filling up clockwise or counterclockwise from the top
+	# One ring per remaining wind, filling clockwise or counterclockwise from the top
 	var winds: int = type.winds_needed()
+	var remaining_winds: int = maxi(winds - _completed_winds, 0)
 	var direction: float = type.direction()
-	var filled: float = _progress * winds
-	for i: int in winds:
+
+	for i: int in remaining_winds:
 		var ring_radius: float = radius + 6.0 + i * RING_SPACING
 		draw_arc(Vector2.ZERO, ring_radius, 0.0, TAU, 32, Color(color, 0.25), 2.0)
-		var fill: float = clampf(filled - i, 0.0, 1.0)
+
+		var fill: float = clampf(_progress - i, 0.0, 1.0)
 		if fill > 0.0:
-			draw_arc(Vector2.ZERO, ring_radius, -PI / 2.0, -PI / 2.0 + direction * fill * TAU, 48, color, 3.0)
+			draw_arc(
+				Vector2.ZERO,
+				ring_radius,
+				-PI / 2.0,
+				-PI / 2.0 + direction * fill * TAU,
+				48,
+				color,
+				3.0
+			)
 
 	# Arrowhead at the top shows which way to go
-	var tip := Vector2(0.0, -(radius + 6.0 + winds * RING_SPACING + 3.0))
-	draw_colored_polygon(PackedVector2Array([
-		tip + Vector2(direction * 7.0, 0.0),
-		tip + Vector2(-direction * 3.0, -5.0),
-		tip + Vector2(-direction * 3.0, 5.0),
-	]), color)
+	if remaining_winds > 0:
+		var tip := Vector2(
+			0.0,
+			-(radius + 6.0 + remaining_winds * RING_SPACING + 3.0)
+		)
+		draw_colored_polygon(PackedVector2Array([
+			tip + Vector2(direction * 7.0, 0.0),
+			tip + Vector2(-direction * 3.0, -5.0),
+			tip + Vector2(-direction * 3.0, 5.0),
+		]), color)
 
 	type.draw_extras()
 
 
 ## Returns the enemies in a freshly instantiated scene: the root if it's an Enemy, otherwise its Enemy children.
-## Children are taken out of the group, keeping their position as an offset from it, and the group is freed.
+## Children are taken out of the group, keeping its position as an offset from it, and the group is freed.
 static func take_from(node: Node) -> Array[Enemy]:
 	var enemies: Array[Enemy] = []
 	if node is Enemy:
@@ -94,15 +110,33 @@ static func take_from(node: Node) -> Array[Enemy]:
 
 
 ## Updates the progress rings and returns true when the thread knots this enemy.
-## [param windings] holds the thread's winding around every enemy in the arena.
+## [param windings] holds the winding around every enemy in the arena.
 func evaluate(windings: Dictionary[Enemy, float]) -> bool:
 	if not is_instance_valid(type):
 		return false
 
 	var along: float = type.wound_amount(windings)
-	var needed: float = type.winds_needed()
-	_progress = clampf(along / needed, 0.0, 1.0)
-	return along >= needed - TOLERANCE
+	var needed: int = type.winds_needed()
+
+	# The thread has been cleared/reset.
+	if absf(along) <= TOLERANCE:
+		_thread_completed_winds = 0
+		_progress = 0.0
+		return false
+
+	# Only count complete winds in the required direction.
+	var completed_in_thread: int = floori(along + TOLERANCE)
+
+	# Only count winds that have not already been counted.
+	var newly_completed: int = completed_in_thread - _thread_completed_winds
+	if newly_completed > 0:
+		_completed_winds += newly_completed
+		_thread_completed_winds = completed_in_thread
+
+	# Show partial progress toward the next wind.
+	_progress = along - completed_in_thread
+
+	return _completed_winds >= needed
 
 
 func knot() -> void:
