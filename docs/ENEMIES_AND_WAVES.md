@@ -12,7 +12,7 @@ How enemies are built and how to add new enemies and waves. Everything except a 
   | `PairedType` | Linked to a partner. One loop around both, in either direction. | *Color* |
 
 - **Enemy scenes** inherit `enemy.tscn` and add a type component, like a Unity prefab variant. They're in `scenes/enemy/enemy_types/`.
-- **Group scenes** are a plain `Node2D` with enemy scenes as children, e.g. `scenes/enemy/enemy_pair.tscn`. They spawn together and keep their layout.
+- **Group scenes** are a plain `Node2D` with enemy scenes as children, e.g. `scenes/enemy/enemy_types/enemy_pair.tscn`. They spawn together and keep their layout.
 - **`WaveData`** (`scripts/waves/wave_data.gd`) is a Resource with a list of enemy or group scenes and an optional HUD *Hint*. Waves are saved in `resources/waves/`.
 - **The arena** (`scenes/arena/arena.tscn`) plays its *Waves* in order. After that it makes random waves from *Random Enemies*, one more enemy each wave, up to *Max Random Enemies*.
 
@@ -66,7 +66,7 @@ When no existing type fits the rule you want:
 ## Add a group of enemies
 1. Scene > *New Scene* > *Other Node* > `Node2D`, and name the root, e.g. `EnemyTrio`. Don't attach a script.
 2. Drag enemy scenes in from the FileSystem dock as children. Their positions are offsets from the spawn point, e.g. (-55, 0) and (55, 0) for the pair.
-3. Save it under `scenes/enemy/`, e.g. `scenes/enemy/enemy_trio.tscn`.
+3. Save it next to the enemy scenes, e.g. `scenes/enemy/enemy_types/enemy_trio.tscn`.
 4. Add it to a wave or to *Random Enemies* like any enemy scene. The whole group spawns at one random point.
 
 ## Add or change a wave
@@ -77,19 +77,19 @@ When no existing type fits the rule you want:
 To change an existing wave, open its `.tres` file and edit it. The arena picks the change up automatically.
 
 ## Current content
+All scenes are in `scenes/enemy/enemy_types/`.
+
 | Scene | Type |
 | --- | --- |
-| `enemy_types/clockwise_enemy.tscn` | `ClockwiseType`, 2 winds |
-| `enemy_types/clockwise_1_enemy.tscn` | `ClockwiseType`, 1 wind |
-| `enemy_types/counterclockwise_enemy.tscn` | `CounterclockwiseType`, 1 wind |
-| `enemy_types/counterclockwise_2_enemy.tscn` | `CounterclockwiseType`, 2 winds |
-| `enemy_types/paired_enemy.tscn` | `PairedType`, only spawn it inside a group |
+| `clockwise_enemy.tscn` | `ClockwiseType`, 2 winds |
+| `counterclockwise_enemy.tscn` | `CounterclockwiseType`, 1 wind |
+| `paired_enemy.tscn` | `PairedType`. Only spawn it inside a group, alone it has no partner. |
 | `enemy_pair.tscn` | Group of two `paired_enemy` |
 
 | Wave | Enemies |
 | --- | --- |
-| `wave_1.tres` | `clockwise_enemy`, with the controls hint |
-| `wave_2.tres` | `clockwise_enemy`, `counterclockwise_enemy` |
-| `wave_3.tres` | `enemy_pair` |
+| `wave_1.tres` | `clockwise_enemy` |
+| `wave_2.tres` | `counterclockwise_enemy` |
+| `wave_3.tres` | `enemy_pair`, `clockwise_enemy` |
 
-*Random Enemies*: `clockwise_enemy`, `counterclockwise_enemy`, `clockwise_1_enemy`, `counterclockwise_2_enemy`, `enemy_pair`.
+*Random Enemies*: `clockwise_enemy`, `counterclockwise_enemy`, `enemy_pair`.
