@@ -12,6 +12,8 @@ extends Node
 @export var winds: int = 1
 ## Which way to wind. Flips the rings and arrow too.
 @export var clockwise: bool = true
+## How the enemy moves. None means it chases the target by default.
+@export var movement_pattern: MovementPattern = null
 
 var enemy: Enemy:
 	get:
@@ -25,6 +27,13 @@ static func find_in(node: Node) -> EnemyType:
 			return child
 
 	return null
+
+
+func _ready() -> void:
+	if movement_pattern:
+		# Simple probability-based removal of the movement pattern, so the enemy doesn't always move the same way.
+		if randf_range(0.0, 1.0) > movement_pattern.probability:
+			movement_pattern.queue_free()
 
 
 ## How many winds the thread has made around the enemy in the direction it needs.
@@ -55,6 +64,11 @@ func direction() -> float:
 
 ## Adjusts the enemy's velocity, which chases the target by default.
 func steer(velocity: Vector2) -> Vector2:
+	return velocity
+
+func apply_movement_pattern(velocity: Vector2) -> Vector2:
+	if movement_pattern:
+		return movement_pattern.apply(velocity)
 	return velocity
 
 

@@ -53,7 +53,11 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if is_knotted or not is_instance_valid(target):
 		return
-	position += type.steer(position.direction_to(target.position) * speed) * delta
+	
+	# Move toward the target, then apply the movement pattern if any. The EnemyType steers the velocity first.
+	position += type.apply_movement_pattern(
+		type.steer(position.direction_to(target.position) * speed)) * delta
+	
 	_attack_in_range()
 
 
