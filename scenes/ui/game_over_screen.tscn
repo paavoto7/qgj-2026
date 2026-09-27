@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://ce11c2i7sv2qe" path="res://scripts/ui/game_over_screen.gd" id="1_script"]
 [ext_resource type="Theme" uid="uid://dxw7j24uanr8r" path="res://resources/ui/overlay_theme.tres" id="2_theme"]
 [ext_resource type="AudioStream" uid="uid://dddak2r5o7euk" path="res://assets/audio/ui/UI_accept.wav" id="3_click"]
+[ext_resource type="FontFile" uid="uid://db0jpf5pcmmx4" path="res://VT323-Regular.ttf" id="4_xra47"]
 
 [node name="GameOverScreen" type="CanvasLayer" unique_id=381351704 node_paths=PackedStringArray("initial_focus")]
 visible = false
@@ -39,6 +40,7 @@ theme_override_constants/separation = 10
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.45, 0.45, 1)
 theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("4_xra47")
 theme_override_font_sizes/font_size = 22
 text = "THE THREAD SNAPPED"
 horizontal_alignment = 1
@@ -48,6 +50,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("4_xra47")
 theme_override_font_sizes/font_size = 56
 text = "Score 0"
 horizontal_alignment = 1
@@ -57,6 +60,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.85, 0.9, 1)
 theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("4_xra47")
 theme_override_font_sizes/font_size = 26
 text = "Best 0"
 horizontal_alignment = 1
@@ -65,6 +69,7 @@ horizontal_alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.78, 1)
+theme_override_fonts/font = ExtResource("4_xra47")
 text = "0 knotted · 0 runs · 0 waves"
 horizontal_alignment = 1
 
@@ -77,6 +82,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
 size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("4_xra47")
 text = "RESTART"
 
 [node name="MenuButton" type="Button" parent="Center/Panel/VBox" unique_id=1604219377]
@@ -84,4 +90,5 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
 size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("4_xra47")
 text = "MAIN MENU"
