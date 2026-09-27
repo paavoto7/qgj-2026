@@ -30,6 +30,10 @@ var color: Color:
 var _progress: float = 0.0
 var _completed_winds: int = 0
 var _thread_completed_winds: int = 0
+var _winding_total: float = 0.0
+var _previous_position: Vector2
+var _previous_player_position: Vector2
+var _winding_initialized: bool = false
 
 @onready var type: EnemyType = EnemyType.find_in(self)
 
@@ -128,22 +132,25 @@ func evaluate(windings: Dictionary[Enemy, float]) -> bool:
 	var along: float = type.wound_amount(windings)
 	var needed: int = type.winds_needed()
 
-	# The thread has been cleared/reset.
+	if along < 0.0:
+		_progress = 0.0
+		return false
+
+	# The current, unfinished wind can be reversed.
 	if absf(along) <= TOLERANCE:
 		_thread_completed_winds = 0
 		_progress = 0.0
 		return false
 
-	# Only count complete winds in the required direction.
+	# Count only newly completed winds.
 	var completed_in_thread: int = floori(along + TOLERANCE)
-
-	# Only count winds that have not already been counted.
 	var newly_completed: int = completed_in_thread - _thread_completed_winds
+
 	if newly_completed > 0:
 		_completed_winds += newly_completed
 		_thread_completed_winds = completed_in_thread
 
-	# Show partial progress toward the next wind.
+	# Progress only represents the currently unfinished wind.
 	_progress = along - completed_in_thread
 
 	return _completed_winds >= needed
@@ -189,3 +196,28 @@ func _drop_item() -> void:
 
 	item.position = position
 	dropped.emit(item)
+
+func update_winding(player_position: Vector2) -> void:
+	var current_position: Vector2 = global_position
+
+	if not _winding_initialized:
+		_previous_player_position = player_position
+		_previous_position = current_position
+		_winding_initialized = true
+		return
+
+	var previous_relative: Vector2 = _previous_player_position - _previous_position
+	var current_relative: Vector2 = player_position - current_position
+
+	if previous_relative.length_squared() > 0.001 and current_relative.length_squared() > 0.001:
+		_winding_total += angle_difference(
+			previous_relative.angle(),
+			current_relative.angle()
+		) / TAU
+
+	_previous_player_position = player_position
+	_previous_position = current_position
+
+
+func get_winding_total() -> float:
+	return _winding_total

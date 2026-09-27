@@ -85,7 +85,8 @@ func _check_knots() -> void:
 	var enemies: Array[Enemy] = _spawner.enemies
 	var windings: Dictionary[Enemy, float] = {}
 	for enemy: Enemy in enemies:
-		windings[enemy] = _player.thread.winding_around(enemy.position)
+		enemy.update_winding(_player.global_position)
+		windings[enemy] = enemy.get_winding_total()
 
 	var knotted: Array[Enemy] = []
 	for enemy: Enemy in enemies:

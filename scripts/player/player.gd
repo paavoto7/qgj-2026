@@ -46,12 +46,14 @@ func _physics_process(delta: float) -> void:
 	if health.is_dead:
 		return
 
-	thread.add_point(position)
 	var input: Vector2 = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
 	velocity = velocity.move_toward(input * speed, acceleration * delta)
 	position += velocity * delta
+
 	if arena.has_area():
 		position = position.clamp(arena.position, arena.end)
+
+	thread.add_point(position)
 
 
 func _draw() -> void:
