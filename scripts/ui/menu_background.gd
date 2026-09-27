@@ -6,119 +6,20 @@ extends MenuBase
 ## a small yellow player, fading golden thread, enemy circles,
 ## winding indicators, and the arena border.
 
-@export var title: String = ""
-@export_multiline var subtitle: String = ""
-@export_file("*.tscn") var game_scene: String = "res://scenes/arena/arena.tscn"
-
-@export var title_font_size: int = 64
-@export var subtitle_font_size: int = 18
-@export var button_min_size: Vector2 = Vector2(240.0, 52.0)
-@export var click_sound: AudioStream
-
 const ARENA_MARGIN: float = 24.0
 const PLAYER_RADIUS: float = 10.0
 const THREAD_COLOR := Color(1.0, 0.85, 0.4)
 
 var _visual: MenuVisual
-var _start_button: Button
 
 
 func _ready() -> void:
 	_build_visual()
-	_build_ui()
 
 
 func _build_visual() -> void:
 	_visual = MenuVisual.new()
 	add_child(_visual)
-
-
-func _build_ui() -> void:
-	var center := CenterContainer.new()
-	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(center)
-
-	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 18)
-	column.alignment = BoxContainer.ALIGNMENT_CENTER
-	center.add_child(column)
-
-	# Title
-	var title_label := Label.new()
-	title_label.text = title
-	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title_label.add_theme_font_size_override("font_size", title_font_size)
-	column.add_child(title_label)
-
-	# Subtitle
-	var subtitle_label := Label.new()
-	subtitle_label.text = subtitle
-	subtitle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	subtitle_label.add_theme_font_size_override("font_size", subtitle_font_size)
-	subtitle_label.modulate = Color(1.0, 1.0, 1.0, 0.65)
-	column.add_child(subtitle_label)
-
-	# Space between subtitle and buttons.
-	var spacer := Control.new()
-	spacer.custom_minimum_size.y = 18.0
-	column.add_child(spacer)
-
-	_start_button = _add_button(column, "START", _on_start_pressed)
-
-	if not OS.has_feature("web"):
-		_add_button(column, "QUIT", _on_quit_pressed)
-
-	initial_focus = _start_button
-	_start_button.grab_focus.call_deferred()
-
-
-func _add_button(parent: Control, text: String, on_pressed: Callable) -> Button:
-	var button := Button.new()
-	button.text = text
-	button.custom_minimum_size = button_min_size
-	button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	button.pivot_offset = button_min_size * 0.5
-
-	button.mouse_entered.connect(func() -> void:
-		_button_hover(button, true)
-	)
-
-	button.mouse_exited.connect(func() -> void:
-		if not button.has_focus():
-			_button_hover(button, false)
-	)
-
-	button.focus_entered.connect(func() -> void:
-		_button_hover(button, true)
-	)
-
-	button.focus_exited.connect(func() -> void:
-		_button_hover(button, false)
-	)
-
-	button.pressed.connect(on_pressed)
-
-	parent.add_child(button)
-	return button
-
-
-func _button_hover(button: Button, hovered: bool) -> void:
-	var target := Vector2(1.06, 1.06) if hovered else Vector2.ONE
-
-	var tween := create_tween()
-	tween.set_trans(Tween.TRANS_QUAD)
-	tween.set_ease(Tween.EASE_OUT)
-	tween.tween_property(button, "scale", target, 0.12)
-
-
-func _on_start_pressed() -> void:
-	AudioManager.play_ui(click_sound)
-	MainManager.change_scene(game_scene)
-
-
-func _on_quit_pressed() -> void:
-	AudioManager.play_ui(click_sound)
-	MainManager.quit_game()
 
 
 class MenuVisual extends Node2D:
@@ -310,17 +211,17 @@ class MenuVisual extends Node2D:
 				arena.size.y - margin * 2.0
 			) / float(rows)
 
-			var position := Vector2(
+			var enemy_position := Vector2(
 				arena.position.x + margin + cell_width * (float(column) + 0.5),
 				arena.position.y + margin + cell_height * (float(row) + 0.5)
 			)
 
-			position += Vector2(
+			enemy_position += Vector2(
 				randf_range(-60.0, 60.0),
 				randf_range(-60.0, 60.0)
 			)
 
-			enemy["position"] = position
+			enemy["position"] = enemy_position
 
 			var direction := Vector2(
 				randf_range(-1.0, 1.0),
@@ -487,7 +388,7 @@ class MenuVisual extends Node2D:
 			if int(enemy.get("kill_state", 0)) != 0:
 				continue
 
-			var position: Vector2 = enemy.get("position", arena.get_center())
+			var enemy_position: Vector2 = enemy.get("position", arena.get_center())
 			var velocity: Vector2 = enemy.get(
 				"move_velocity",
 				Vector2.RIGHT * ENEMY_SPEED
@@ -505,7 +406,7 @@ class MenuVisual extends Node2D:
 			velocity += wander * 18.0 * delta
 
 			# Steer away from the player before getting too close.
-			var player_offset := position - player_position
+			var player_offset := enemy_position - player_position
 			var player_distance := player_offset.length()
 			var player_safe_distance := (
 				float(enemy.get("radius", 16.0))
@@ -526,27 +427,27 @@ class MenuVisual extends Node2D:
 				# It is still completely free-moving; there is no hard boundary.
 				wall_margin = 350.0
 
-			if position.x < arena.position.x + wall_margin:
+			if enemy_position.x < arena.position.x + wall_margin:
 				var strength := 1.0 - (
-					position.x - arena.position.x
+					enemy_position.x - arena.position.x
 				) / wall_margin
 				wall_force.x += strength * strength
 
-			if position.x > arena.end.x - wall_margin:
+			if enemy_position.x > arena.end.x - wall_margin:
 				var strength := 1.0 - (
-					arena.end.x - position.x
+					arena.end.x - enemy_position.x
 				) / wall_margin
 				wall_force.x -= strength * strength
 
-			if position.y < arena.position.y + wall_margin:
+			if enemy_position.y < arena.position.y + wall_margin:
 				var strength := 1.0 - (
-					position.y - arena.position.y
+					enemy_position.y - arena.position.y
 				) / wall_margin
 				wall_force.y += strength * strength
 
-			if position.y > arena.end.y - wall_margin:
+			if enemy_position.y > arena.end.y - wall_margin:
 				var strength := 1.0 - (
-					arena.end.y - position.y
+					arena.end.y - enemy_position.y
 				) / wall_margin
 				wall_force.y -= strength * strength
 
@@ -565,7 +466,7 @@ class MenuVisual extends Node2D:
 			velocity = velocity.normalized() * speed
 
 			enemy["move_velocity"] = velocity
-			enemy["position"] = position + velocity * delta
+			enemy["position"] = enemy_position + velocity * delta
 
 
 		_separate_enemies()
@@ -1011,12 +912,12 @@ class MenuVisual extends Node2D:
 		if state == 2:
 			return
 
-		var position: Vector2 = enemy.get("position", Vector2.ZERO)
+		var enemy_position: Vector2 = enemy.get("position", Vector2.ZERO)
 		var radius: float = enemy.get("radius", 16.0)
 		var color: Color = enemy.get("color", Color.WHITE)
 
 		if state == 1:
-			_draw_knotting_enemy(enemy, position, radius, color)
+			_draw_knotting_enemy(enemy, enemy_position, radius, color)
 			return
 
 		var alpha: float = enemy.get("fade_alpha", 1.0)
@@ -1037,9 +938,9 @@ class MenuVisual extends Node2D:
 			alpha
 		)
 
-		draw_circle(position, radius, dark_color)
+		draw_circle(enemy_position, radius, dark_color)
 		draw_arc(
-			position,
+			enemy_position,
 			radius,
 			0.0,
 			TAU,
@@ -1048,12 +949,12 @@ class MenuVisual extends Node2D:
 			2.0
 		)
 
-		_draw_winding_indicator(enemy, position, radius, alpha)
+		_draw_winding_indicator(enemy, enemy_position, radius, alpha)
 
 
 	func _draw_winding_indicator(
 		enemy: Dictionary,
-		position: Vector2,
+		enemy_position: Vector2,
 		radius: float,
 		alpha: float
 	) -> void:
@@ -1072,7 +973,7 @@ class MenuVisual extends Node2D:
 			var ring_radius := radius + 6.0 + i * 5.0
 
 			draw_arc(
-				position,
+				enemy_position,
 				ring_radius,
 				0.0,
 				TAU,
@@ -1089,7 +990,7 @@ class MenuVisual extends Node2D:
 
 			if fill > 0.0:
 				draw_arc(
-					position,
+					enemy_position,
 					ring_radius,
 					-PI / 2.0,
 					-PI / 2.0 + direction * fill * TAU,
@@ -1105,9 +1006,9 @@ class MenuVisual extends Node2D:
 
 		draw_colored_polygon(
 			PackedVector2Array([
-				position + tip + Vector2(direction * 7.0, 0.0),
-				position + tip + Vector2(-direction * 3.0, -5.0),
-				position + tip + Vector2(-direction * 3.0, 5.0),
+				enemy_position + tip + Vector2(direction * 7.0, 0.0),
+				enemy_position + tip + Vector2(-direction * 3.0, -5.0),
+				enemy_position + tip + Vector2(-direction * 3.0, 5.0),
 			]),
 			Color(color, alpha)
 		)
@@ -1115,18 +1016,18 @@ class MenuVisual extends Node2D:
 
 	func _draw_knotting_enemy(
 		enemy: Dictionary,
-		position: Vector2,
+		enemy_position: Vector2,
 		radius: float,
 		color: Color
 	) -> void:
 		var progress: float = enemy.get("kill_progress", 0.0)
-		var rotation: float = enemy.get("kill_rotation", 0.0)
+		var kill_rotation: float = enemy.get("kill_rotation", 0.0)
 
-		var t := clampf(progress, 0.0, 1.0)
+		var t: float = clampf(progress, 0.0, 1.0)
 
 		# Matches the game's shrink-and-spin feel.
-		var scale := 1.0 - t
-		var animated_radius := radius * scale
+		var enemy_scale := 1.0 - t
+		var animated_radius := radius * enemy_scale
 
 		if animated_radius <= 0.1:
 			return
@@ -1150,7 +1051,7 @@ class MenuVisual extends Node2D:
 		)
 
 		draw_circle(
-			position,
+			enemy_position,
 			animated_radius,
 			dark_color
 		)
@@ -1164,12 +1065,12 @@ class MenuVisual extends Node2D:
 			)
 
 			var start_angle := (
-				rotation
+				kill_rotation
 				+ ring_fraction * TAU / 3.0
 			)
 
 			draw_arc(
-				position,
+				enemy_position,
 				ring_radius,
 				start_angle,
 				start_angle + TAU * (0.72 + t * 0.2),
@@ -1179,10 +1080,10 @@ class MenuVisual extends Node2D:
 			)
 
 		draw_arc(
-			position,
+			enemy_position,
 			animated_radius,
-			rotation,
-			rotation + TAU,
+			kill_rotation,
+			kill_rotation + TAU,
 			32,
 			body_color,
 			2.0
