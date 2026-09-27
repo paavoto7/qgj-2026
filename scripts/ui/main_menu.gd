@@ -1,7 +1,7 @@
 @tool
 class_name MainMenu
 extends MenuBase
-## Main menu for Winding Combat: title, subtitle and buttons over a [MenuBackground].
+## Main menu: title, subtitle and buttons over a [MenuBackground].
 
 const SUBTITLE_COLOR: Color = Color(1.0, 1.0, 1.0, 0.65)
 const HOVER_SCALE: Vector2 = Vector2(1.06, 1.06)
@@ -12,8 +12,8 @@ const INTRO_OFFSET: float = 12.0
 ## Delay between the title, subtitle and each button fading in.
 const INTRO_STAGGER: float = 0.12
 
-@export var title: String = "WINDING COMBAT"
-@export_multiline var subtitle: String = "Don't shoot. Wind your thread. Knot your enemies."
+@export var title: String = "KNOT TODAY"
+@export_multiline var subtitle: String = "Wind your thread, knot your enemies."
 @export_file("*.tscn") var game_scene: String = "res://scenes/arena/arena.tscn"
 
 @export var title_font_size: int = 64

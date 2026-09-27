@@ -4,8 +4,9 @@
 [ext_resource type="Script" uid="uid://cmfv7ooftmf26" path="res://scripts/resources/waves/wave_data.gd" id="1_uha60"]
 [ext_resource type="PackedScene" uid="uid://c5m6bvndaofrw" path="res://scenes/enemy/enemy_types/ranged_enemy.tscn" id="2_ayxtd"]
 [ext_resource type="PackedScene" uid="uid://dhy0a5ypxupjt" path="res://scenes/enemy/enemy_types/yellow_enemy.tscn" id="3_dn3pd"]
+[ext_resource type="PackedScene" uid="uid://clr1lmpaclh65" path="res://scenes/enemy/enemy_types/white_enemy.tscn" id="4_gyw3r"]
 
 [resource]
 script = ExtResource("1_uha60")
-enemies = Array[PackedScene]([ExtResource("1_jy0as"), ExtResource("2_ayxtd"), ExtResource("3_dn3pd")])
+enemies = Array[PackedScene]([ExtResource("1_jy0as"), ExtResource("2_ayxtd"), ExtResource("3_dn3pd"), ExtResource("4_gyw3r")])
 metadata/_custom_type_script = "uid://cmfv7ooftmf26"

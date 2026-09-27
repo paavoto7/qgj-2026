@@ -15,4 +15,4 @@ is_melee = false
 
 [node name="Type" type="Node" parent="." index="1" unique_id=228581965]
 script = ExtResource("3_girxq")
-color = Color(0.8627451, 0.3019608, 0.003921569, 1)
+color = Color(1, 0.54901963, 0.101960786, 1)
