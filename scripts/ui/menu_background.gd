@@ -519,32 +519,43 @@ class MenuVisual extends Node2D:
 
 			# Wall steering.
 			var wall_force := Vector2.ZERO
+			var wall_margin := ENEMY_WALL_MARGIN
 
-			if position.x < arena.position.x + ENEMY_WALL_MARGIN:
+			if enemy["color"] == Color.BLACK:
+				# The fast enemy reacts earlier and more strongly to the walls.
+				# It is still completely free-moving; there is no hard boundary.
+				wall_margin = 350.0
+
+			if position.x < arena.position.x + wall_margin:
 				var strength := 1.0 - (
 					position.x - arena.position.x
-				) / ENEMY_WALL_MARGIN
-				wall_force.x += strength
+				) / wall_margin
+				wall_force.x += strength * strength
 
-			if position.x > arena.end.x - ENEMY_WALL_MARGIN:
+			if position.x > arena.end.x - wall_margin:
 				var strength := 1.0 - (
 					arena.end.x - position.x
-				) / ENEMY_WALL_MARGIN
-				wall_force.x -= strength
+				) / wall_margin
+				wall_force.x -= strength * strength
 
-			if position.y < arena.position.y + ENEMY_WALL_MARGIN:
+			if position.y < arena.position.y + wall_margin:
 				var strength := 1.0 - (
 					position.y - arena.position.y
-				) / ENEMY_WALL_MARGIN
-				wall_force.y += strength
+				) / wall_margin
+				wall_force.y += strength * strength
 
-			if position.y > arena.end.y - ENEMY_WALL_MARGIN:
+			if position.y > arena.end.y - wall_margin:
 				var strength := 1.0 - (
 					arena.end.y - position.y
-				) / ENEMY_WALL_MARGIN
-				wall_force.y -= strength
+				) / wall_margin
+				wall_force.y -= strength * strength
 
-			velocity += wall_force * 100.0 * delta
+			var wall_strength := 100.0
+
+			if enemy["color"] == Color.BLACK:
+				wall_strength = 260.0
+
+			velocity += wall_force * wall_strength * delta
 
 			var speed: float = enemy.get("speed", ENEMY_SPEED)
 
@@ -555,6 +566,7 @@ class MenuVisual extends Node2D:
 
 			enemy["move_velocity"] = velocity
 			enemy["position"] = position + velocity * delta
+
 
 		_separate_enemies()
 		_update_green_pair(delta)
@@ -777,11 +789,9 @@ class MenuVisual extends Node2D:
 			for green in [enemies[7], enemies[8]]:
 				_start_knot(green)
 
-			thread.clear()
 			return
 
 		_start_knot(enemy)
-		thread.clear()
 
 
 	func _start_knot(enemy: Dictionary) -> void:
@@ -822,15 +832,46 @@ class MenuVisual extends Node2D:
 		if enemy["color"] == Color(1.0, 0.85, 0.4):
 			enemy["direction"] = 1.0 if randf() < 0.5 else -1.0
 
-		# Green pair respawns together.
+		# Green pair respawns together, already next to each other.
 		if enemy == enemies[7] or enemy == enemies[8]:
-			var center: Vector2 = enemy["position"]
-
 			var green_a: Dictionary = enemies[7]
 			var green_b: Dictionary = enemies[8]
 
+			var center: Vector2 = _find_respawn_position(enemy)
+
+			var spacing := (
+				float(green_a.get("radius", 16.0))
+				+ float(green_b.get("radius", 16.0))
+				+ 30.0
+			)
+
+			var half_spacing := spacing * 0.5
+
+			center.x = clampf(
+				center.x,
+				arena.position.x + half_spacing + 10.0,
+				arena.end.x - half_spacing - 10.0
+			)
+
+			center.y = clampf(
+				center.y,
+				arena.position.y + half_spacing + 10.0,
+				arena.end.y - half_spacing - 10.0
+			)
+
+			var pair_direction := Vector2(
+				randf_range(-1.0, 1.0),
+				randf_range(-1.0, 1.0)
+			).normalized()
+
+			if pair_direction.length() < 0.001:
+				pair_direction = Vector2.RIGHT
+
 			green_a["pair_center"] = center
 			green_b["pair_center"] = center
+
+			green_a["position"] = center - pair_direction * half_spacing
+			green_b["position"] = center + pair_direction * half_spacing
 
 			green_a["kill_state"] = 3
 			green_b["kill_state"] = 3
@@ -842,13 +883,8 @@ class MenuVisual extends Node2D:
 			green_a["thread_completed_winds"] = 0
 			green_b["thread_completed_winds"] = 0
 
-			var pair_direction := Vector2(
-				randf_range(-1.0, 1.0),
-				randf_range(-1.0, 1.0)
-			).normalized()
-
-			if pair_direction.length() < 0.001:
-				pair_direction = Vector2.RIGHT
+			green_a["progress"] = 0.0
+			green_b["progress"] = 0.0
 
 			green_a["pair_velocity"] = pair_direction * 35.0
 			green_b["pair_velocity"] = pair_direction * 35.0
