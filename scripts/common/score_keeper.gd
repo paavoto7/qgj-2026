@@ -10,6 +10,8 @@ signal combo_changed(combo: int, time_left: float)
 var combo_window: float = 3.0
 var score: int = 0
 var combo: int = 0
+## Enemies knotted this run.
+var knots: int = 0
 
 var _combo_timer: float = 0.0
 
@@ -28,6 +30,7 @@ func add_knots(count: int) -> void:
 	if count <= 0:
 		return
 
+	knots += count
 	for i: int in count:
 		combo += 1
 		score += 100 * combo

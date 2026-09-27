@@ -114,4 +114,11 @@ func _on_player_damaged(_amount: int) -> void:
 
 
 func _on_player_died() -> void:
+	# The wave the player died on wasn't cleared
+	var waves_cleared: int = maxi(_spawner.wave - 1, 0)
+	var score: int = _score_keeper.score
+	var is_new_high_score: bool = MainManager.game_data.record_run(score, _score_keeper.knots, waves_cleared)
+	MainManager.save_game_data()
+
+	_hud.show_game_over(score, is_new_high_score)
 	MainManager.pause_game()

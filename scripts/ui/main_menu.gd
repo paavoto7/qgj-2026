@@ -18,6 +18,7 @@ const INTRO_STAGGER: float = 0.12
 
 @export var title_font_size: int = 64
 @export var subtitle_font_size: int = 18
+@export var stats_font_size: int = 16
 @export var button_min_size: Vector2 = Vector2(240.0, 52.0)
 @export var click_sound: AudioStream
 
@@ -66,6 +67,12 @@ func _build_ui() -> void:
 	if _can_quit():
 		intro_items.append(_add_button(column, "QUIT", _on_quit_pressed))
 
+	# Autoloads don't run in the editor preview
+	if not Engine.is_editor_hint() and MainManager.game_data.runs_played > 0:
+		var stats_label := _add_label(column, _stats_text(MainManager.game_data), stats_font_size)
+		stats_label.add_theme_color_override("font_color", SUBTITLE_COLOR)
+		intro_items.append(stats_label)
+
 	initial_focus = _start_button
 	# The script runs in the editor for the preview, where it shouldn't steal focus
 	if not Engine.is_editor_hint():
@@ -80,6 +87,12 @@ func _add_label(parent: Control, text: String, font_size: int) -> Label:
 	label.add_theme_font_size_override("font_size", font_size)
 	parent.add_child(label)
 	return label
+
+
+func _stats_text(data: GameData) -> String:
+	return "Best %d · %d knotted · %d runs · %d waves" % [
+		data.high_score, data.enemies_knotted, data.runs_played, data.waves_cleared
+	]
 
 
 func _add_button(parent: Control, text: String, on_pressed: Callable) -> Button:

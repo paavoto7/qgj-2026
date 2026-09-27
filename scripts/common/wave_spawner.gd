@@ -8,6 +8,10 @@ signal wave_started(wave_data: WaveData, number: int)
 signal item_dropped(item: Node2D)
 
 var enemies: Array[Enemy] = []
+## The current wave number, 0 before the first wave.
+var wave: int:
+	get:
+		return _wave
 
 var _data: ArenaData
 var _bounds: Rect2
