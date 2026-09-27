@@ -36,21 +36,34 @@ func next_wave() -> void:
 ## and items it drops are passed on through item_dropped.
 func add_enemy(enemy: Enemy) -> void:
 	enemy.target = _target
+	enemy.wave = _wave
 	add_child(enemy)
 	enemies.append(enemy)
 	enemy.spawned.connect(add_enemy)
 	enemy.dropped.connect(item_dropped.emit)
 
 
-## The scripted waves in order, then random picks that grow with the wave number.
+## The scripted waves in order, then weighted random picks that grow with the wave number.
 func _wave_scenes() -> Array[PackedScene]:
 	var wave_data: WaveData = _current_wave_data()
 	if wave_data:
 		return wave_data.enemies
 
+	var entries: Array[SpawnEntry] = []
+	var weights := PackedFloat32Array()
+	for entry: SpawnEntry in _data.random_spawns:
+		if entry and entry.scene:
+			entries.append(entry)
+			weights.append(WeightedRandom.weight_of(entry.weight, _wave))
+	if entries.is_empty():
+		return []
+
 	var scenes: Array[PackedScene] = []
 	for i: int in mini(_wave - 1, _data.max_random_enemies):
-		scenes.append(_data.random_enemies.pick_random())
+		var index: int = WeightedRandom.pick_index(weights)
+		# Every weight is 0 on this wave, so don't leave the wave empty
+		var entry: SpawnEntry = entries[index] if index >= 0 else entries.pick_random()
+		scenes.append(entry.scene)
 	return scenes
 
 

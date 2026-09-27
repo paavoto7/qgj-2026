@@ -38,8 +38,8 @@ func _ready() -> void:
 		set_physics_process(false)
 		return
 
-	if not arena_data.player_scene or arena_data.random_enemies.is_empty():
-		push_error("Arena needs a Player Scene and at least one scene in Random Enemies.")
+	if not arena_data.player_scene or arena_data.random_spawns.is_empty():
+		push_error("Arena needs a Player Scene and at least one entry in Random Spawns.")
 		set_physics_process(false)
 		return
 

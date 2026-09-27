@@ -12,6 +12,6 @@ extends Resource
 @export var player_scene: PackedScene
 ## Scripted opening waves, played in order.
 @export var waves: Array[WaveData] = []
-## Enemy or group scenes that random waves pick from after the scripted waves.
-@export var random_enemies: Array[PackedScene] = []
+## Enemy or group scenes that random waves pick from after the scripted waves, each with a weight per wave.
+@export var random_spawns: Array[SpawnEntry] = []
 @export var max_random_enemies: int = 6

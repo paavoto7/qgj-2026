@@ -2,9 +2,10 @@
 class_name MovementPattern
 extends Node2D
 ## A movement pattern that can be applied to an Enemy's velocity.
-## Add exactly one as a child of an EnemyType.
+## Add one or more as children of an EnemyType. One of them, or none, is picked by weight when the enemy spawns.
 
-@export var probability: float = 0.5
+## How likely this pattern is compared to the others and the type's No Pattern Weight. Empty means 1.
+@export var weight: WaveWeight = null
 
 
 ## Applies the movement pattern to the given velocity.

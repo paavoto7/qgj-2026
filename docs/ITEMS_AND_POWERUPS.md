@@ -14,7 +14,7 @@ How enemies drop items, how the player collects them and how to add new powerups
 
 - **`Powerups`** (`scripts/components/powerups.gd`) is a component, a child node of the `Player`. It applies powerups and removes timed ones when they run out. Picking up a powerup that's already active restarts its timer instead of stacking it. It emits `powerup_added` and `powerup_expired`, e.g. for the HUD, and clears everything when the player dies.
 - **The player** needs an `Interactor` under its `HitBox` to collect items, and a `Powerups` child for powerups. The item's `Area2D` goes on collision layer 4 (interactable), which the `HitBox` already masks.
-- **`Droppable`** (`scripts/resources/items/droppable.gd`) is a Resource with an item scene and its *Rarity*.
+- **`Droppable`** (`scripts/resources/items/droppable.gd`) is a Resource with an item scene, its *Rarity* and an optional *Wave Weight*.
 - **`DropTable`** (`scripts/resources/items/drop_table.gd`) is a Resource with a *Drop Chance* and a list of *Drops*. Each enemy scene has its own, set on the root `Enemy` node's *Drop Table*, so different enemies can drop different things. No table means the enemy drops nothing.
 
 When an enemy is knotted it rolls its table. A dropped item goes up through the `WaveSpawner` (`item_dropped`) to the `Arena`, which adds it where the enemy was, inside the arena border.
@@ -42,6 +42,8 @@ For example, a table with *Drop Chance* 0.3, a Common heal and a Rare shield has
 | Shield | 15 / 70 ≈ 21% | 0.3 × 21% ≈ 6% |
 
 So adding more entries makes each existing one rarer, and a table with a single entry always drops that entry when something drops, whatever its rarity. The same item can be in a table more than once to raise its share.
+
+To change the odds over the waves, give a `Droppable` a *Wave Weight*. Its value for the enemy's wave multiplies the rarity weight, e.g. a Legendary with *Weight* 1 and *Per Wave* 0.5 counts as 2 on wave 1 and 20 on wave 19, and *From Wave* 5 makes it never drop before wave 5. Empty means ×1. See [Wave-based weights](ENEMIES_AND_WAVES.md#wave-based-weights) for the settings.
 
 ## Make an enemy drop items
 1. Right-click `resources/items/` > *Create New* > *Resource…* > `Droppable`. Set *Item Scene* to a powerup scene and pick a *Rarity*. Save it, e.g. `resources/items/heal_common.tres`. One `Droppable` can be reused in many tables.

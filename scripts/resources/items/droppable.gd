@@ -15,7 +15,10 @@ enum Rarity
 @export var rarity: Rarity = Rarity.COMMON
 ## The scene to drop. Its root is usually an Area2D with an Item child.
 @export var item_scene: PackedScene
+## Optional. Multiplies the rarity weight per wave, e.g. to make an item likelier in later waves.
+@export var wave_weight: WaveWeight = null
 
-var weight: int:
-	get:
-		return int(rarity)
+
+## The rarity weight on the given wave, times Wave Weight if set.
+func get_weight(wave: int) -> float:
+	return int(rarity) * WeightedRandom.weight_of(wave_weight, wave)

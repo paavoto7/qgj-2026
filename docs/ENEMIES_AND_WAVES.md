@@ -17,8 +17,8 @@ How enemies are built and how to add new enemies and waves. Everything except a 
 - **Enemy scenes** inherit `enemy.tscn` and add a type component, like a Unity prefab variant. They're in `scenes/enemy/enemy_types/`.
 - **Group scenes** are a plain `Node2D` with enemy scenes as children, e.g. `scenes/enemy/enemy_types/enemy_pair.tscn`. They spawn together and keep their layout.
 - **`WaveData`** (`scripts/resources/waves/wave_data.gd`) is a Resource with a list of enemy or group scenes and an optional HUD *Hint*. Waves are saved in `resources/waves/`.
-- **`ArenaData`** (`scripts/resources/arena/arena_data.gd`) is a Resource with an arena's settings: the player scene, *Waves*, *Random Enemies* and *Max Random Enemies*. The current one is `resources/arena/test_arena.tres`, assigned to the `Arena` node's *Arena Data*.
-- **The arena** (`scenes/arena/arena.tscn`) has a `WaveSpawner` child that plays the *Waves* in order. After that it makes random waves from *Random Enemies*, one more enemy each wave, up to *Max Random Enemies*.
+- **`ArenaData`** (`scripts/resources/arena/arena_data.gd`) is a Resource with an arena's settings: the player scene, *Waves*, *Random Spawns* and *Max Random Enemies*. The current one is `resources/arena/test_arena.tres`, assigned to the `Arena` node's *Arena Data*.
+- **The arena** (`scenes/arena/arena.tscn`) has a `WaveSpawner` child that plays the *Waves* in order. After that it makes random waves from *Random Spawns*, one more enemy each wave, up to *Max Random Enemies*. Each pick is weighted by the entry's `WaveWeight` for the current wave, see [Wave-based weights](#wave-based-weights).
 
 The arena doesn't know about specific enemy types. It only instantiates scenes.
 
@@ -28,7 +28,7 @@ For example, a clockwise enemy that needs 3 winds:
 2. Rename the root, e.g. `Clockwise3Enemy`.
 3. Select the `Type` node and set *Winds* = 3. The root `Enemy` node has *Speed* and *Radius* too.
 4. Save it as `scenes/enemy/enemy_types/clockwise_3_enemy.tscn`.
-5. Add it to a wave or to *Random Enemies* in the arena's `ArenaData`.
+5. Add it to a wave, or as a `SpawnEntry` to *Random Spawns* in the arena's `ArenaData`.
 
 ## Add a new enemy type
 When no existing type fits the rule you want:
@@ -63,13 +63,13 @@ When no existing type fits the rule you want:
 
    The type's enemy is available as `enemy`.
 4. Make a scene for it: right-click `scenes/enemy/enemy.tscn` > *New Inherited Scene*. Rename the root (e.g. `SpiralEnemy`), add a `Node` child named `Type`, attach the new script, set its *Color* and *Winds*, and save it as `scenes/enemy/enemy_types/spiral_enemy.tscn`.
-5. Add the scene to a wave or to *Random Enemies*.
+5. Add the scene to a wave or to *Random Spawns*.
 
 ## Add a group of enemies
 1. Scene > *New Scene* > *Other Node* > `Node2D`, and name the root, e.g. `EnemyTrio`. Don't attach a script.
 2. Drag enemy scenes in from the FileSystem dock as children. Their positions are offsets from the spawn point, e.g. (-55, 0) and (55, 0) for the pair.
 3. Save it next to the enemy scenes, e.g. `scenes/enemy/enemy_types/enemy_trio.tscn`.
-4. Add it to a wave or to *Random Enemies* like any enemy scene. The whole group spawns at one random point.
+4. Add it to a wave or to *Random Spawns* like any enemy scene. The whole group spawns at one random point.
 
 ## Add or change a wave
 1. Right-click `resources/waves/` > *Create New* > *Resource…* > `WaveData`, and save it as e.g. `wave_4.tres`.
@@ -77,6 +77,26 @@ When no existing type fits the rule you want:
 3. Open the arena's `ArenaData` (`resources/arena/test_arena.tres`) and add the wave to *Waves* in the position it should play.
 
 To change an existing wave, open its `.tres` file and edit it. The arena picks the change up automatically.
+
+## Wave-based weights
+A **`WaveWeight`** (`scripts/resources/weights/wave_weight.gd`) is a Resource that says how likely something is on a given wave, compared to the other options it's picked from. It's used for random spawns, movement patterns and drops (see [ITEMS_AND_POWERUPS.md](ITEMS_AND_POWERUPS.md)). An empty weight slot counts as 1 on every wave, so leaving them all empty gives an even pick.
+
+| Setting | Meaning |
+| --- | --- |
+| *Weight* | Weight on *From Wave*. |
+| *Per Wave* | Added every wave after *From Wave*. Negative makes it rarer over time. |
+| *From Wave* | 0 before this wave. |
+| *Until Wave* | 0 after this wave. 0 means no end. |
+| *Max Weight* | Cap on the weight. 0 means no cap. |
+| *Curve* | Optional. Replaces *Weight* and *Per Wave*: x is the wave, y the weight. Set the curve's *Min/Max Domain* to the waves it covers, e.g. 1 to 20. |
+
+Weights are relative, like drop rarities: an option's chance is its weight divided by the total of all options on that wave. For example, a clockwise enemy with no weight (1) and a ranged enemy with *Weight* 0.5, *Per Wave* 0.25 and *From Wave* 6 are never ranged before wave 6, 1/3 ranged on wave 6 and 3/5 ranged on wave 10. The wave number counts the scripted waves too.
+
+**Random spawns:** each entry in *Random Spawns* is a `SpawnEntry` with a *Scene* and a *Weight*. If every weight is 0 on some wave, the spawner picks evenly so the wave isn't empty.
+
+**Movement patterns:** add one or more `MovementPattern` nodes (e.g. `SineMovementPattern`) as children of an enemy's `Type` node, each with its own *Weight*. When the enemy spawns, one of them or none is picked. *No Pattern Weight* on the `Type` node is the weight of just chasing. With one pattern and no weights set, it's 50/50.
+
+Add a `WaveWeight` in the inspector with *New WaveWeight* on any weight slot, or save one as a file in `resources/weights/` to reuse it.
 
 ## Current content
 All scenes are in `scenes/enemy/enemy_types/`.
@@ -102,4 +122,4 @@ Every enemy inherits a melee `Attack` from `enemy.tscn` (1 damage, 10 px reach, 
 | `wave_2.tres` | `counterclockwise_enemy` |
 | `wave_3.tres` | `enemy_pair`, `clockwise_enemy` |
 
-*Random Enemies*: `clockwise_enemy`, `counterclockwise_enemy`, `enemy_pair`, `fast_small_enemy`, `ranged_enemy`.
+*Random Spawns*: `clockwise_enemy`, `counterclockwise_enemy`, `enemy_pair`, `fast_small_enemy`, `ranged_enemy`.
