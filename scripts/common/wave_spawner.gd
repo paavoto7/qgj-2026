@@ -27,8 +27,8 @@ func setup(data: ArenaData, bounds: Rect2, target: Player) -> void:
 
 func next_wave() -> void:
 	_wave += 1
-	for scene: PackedScene in _wave_scenes():
-		_spawn(scene)
+	for enemy_scene: PackedScene in _current_wave_enemies():
+		_spawn(enemy_scene)
 	wave_started.emit(_current_wave_data(), _wave)
 
 
@@ -53,9 +53,13 @@ func add_enemy(enemy: Enemy) -> void:
 	enemy.dropped.connect(item_dropped.emit)
 
 
-## The scripted waves in order, then weighted random picks that grow with the wave number.
-func _wave_scenes() -> Array[PackedScene]:
+## The enemy scenes to spawn this wave: the scripted wave's enemies, or weighted random picks
+## that grow with the wave number once the scripted waves run out.
+func _current_wave_enemies() -> Array[PackedScene]:
 	var wave_data: WaveData = _current_wave_data()
+	while wave_data and wave_data.is_test_wave:
+		_wave += 1
+		wave_data = _current_wave_data()
 	if wave_data:
 		return wave_data.enemies
 

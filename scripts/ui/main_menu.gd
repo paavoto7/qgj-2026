@@ -38,7 +38,7 @@ func _ready() -> void:
 	add_child(_background)
 	_build_ui()
 	if background_music:
-		AudioManager.play_music(background_music, music_volume_db)
+		AudioManager.play_music(background_music, 0.0, music_volume_db)
 
 
 func _exit_tree() -> void:

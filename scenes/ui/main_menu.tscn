@@ -5,9 +5,11 @@
 [ext_resource type="AudioStream" uid="uid://bv8vubvgmqvap" path="res://assets/audio/music/moodmode-that-8-bit-music-322062.mp3" id="3_1g8jr"]
 [ext_resource type="FontFile" uid="uid://db0jpf5pcmmx4" path="res://assets/fonts/VT323-Regular.ttf" id="4_m1kxf"]
 
-[node name="MainMenu" type="CanvasLayer" unique_id=1632197068]
+[node name="MainMenu" type="CanvasLayer" unique_id=1632197068 node_paths=PackedStringArray("initial_focus")]
 process_mode = 3
 script = ExtResource("1_menu")
 click_sound = ExtResource("2_fe2o3")
 background_music = ExtResource("3_1g8jr")
+music_volume_db = -10.0
 menu_font = ExtResource("4_m1kxf")
+initial_focus = NodePath("@CenterContainer@20632/@VBoxContainer@20633/@Button@20637")
