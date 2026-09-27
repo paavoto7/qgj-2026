@@ -10,10 +10,12 @@ config_version=5
 
 [application]
 
-config/name="quantum"
+config/name="Knot today"
+config/version="0.1"
 run/main_scene="res://scenes/ui/main_menu.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
-config/icon="res://icon.svg"
+boot_splash/bg_color=Color(0.08235294, 0.08235294, 0.1254902, 1)
+config/icon="uid://c78cugp3mhrxy"
 
 [autoload]
 
