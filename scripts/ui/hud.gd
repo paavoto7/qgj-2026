@@ -90,13 +90,10 @@ func _on_player_health_changed(current: int, _maximum: int) -> void:
 
 
 func _update_hud() -> void:
-	var hp := ""
-	for i: int in 3:
-		hp += "◼ " if i < _player_health else "◻ "
-	hp = hp.strip_edges()
+	var hp := "HP %d" % _player_health
 
-	_score_label.text = "%-13s%-12s%-16s" % [
-		"HP " + hp,
+	_score_label.text = "%-8s%-12s%-16s" % [
+		hp,
 		"WAVE %02d" % _wave_number,
 		"SCORE %d" % _score,
 	]
