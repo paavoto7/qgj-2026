@@ -8,8 +8,9 @@ extends EnemyType
 @export var required_winds: int = 3
 
 var _starting_direction: float = 1.0
-var _winding_origin: float = 0.0
-var _origin_wind_count: int = 0
+## Progress of the current wind in the required direction. Never below 0.
+var _progress: float = 0.0
+var _last_winding: float = 0.0
 
 
 func _ready() -> void:
@@ -20,24 +21,25 @@ func _ready() -> void:
 
 
 func wound_amount(windings: Dictionary[Enemy, float]) -> float:
-	var raw_winding: float = windings.get(enemy, 0.0)
+	# Add how far the player wound this frame. The wrong way counts as negative,
+	# but progress never drops below 0, so turning around counts straight away.
+	var winding: float = windings.get(enemy, 0.0)
+	_progress = maxf(_progress + (winding - _last_winding) * direction(), 0.0)
+	_last_winding = winding
+	return _progress
 
-	# When Purple completes a wind, use the current thread winding
-	# as the starting point for the next direction.
-	if enemy._completed_winds != _origin_wind_count:
-		_winding_origin = raw_winding
-		_origin_wind_count = enemy._completed_winds
 
-	var winding: float = (raw_winding - _winding_origin) * direction()
-	return maxf(winding, 0.0)
+func on_wind_completed() -> void:
+	# The direction flips, so the next wind starts from scratch
+	_progress = 0.0
 
 
 func direction() -> float:
-	if not is_instance_valid(enemy):
-		return _starting_direction
-
 	# Flip direction after every completed wind.
-	return _starting_direction * (-1.0 if enemy._completed_winds % 2 == 1 else 1.0)
+	if enemy._completed_winds % 2 == 0:
+		return _starting_direction
+	else:
+		return _starting_direction * -1.0
 
 
 func winds_needed() -> int:

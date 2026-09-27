@@ -156,6 +156,7 @@ func evaluate(windings: Dictionary[Enemy, float]) -> bool:
 	if newly_completed > 0:
 		_completed_winds += newly_completed
 		_thread_completed_winds = completed_in_thread
+		type.on_wind_completed()
 
 	# Progress only represents the currently unfinished wind.
 	_progress = along - completed_in_thread

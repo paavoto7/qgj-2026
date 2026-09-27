@@ -96,6 +96,11 @@ func on_spawned(_group: Array[Enemy]) -> void:
 	pass
 
 
+## Called each time the thread completes a wind around the enemy, before the knot check.
+func on_wind_completed() -> void:
+	pass
+
+
 ## Called when the enemy is knotted, before it disappears. Spawn extra enemies with [method Enemy.spawn].
 func on_knotted() -> void:
 	pass

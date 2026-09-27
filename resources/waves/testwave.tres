@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="WaveData" format=3 uid="uid://lt2o3dka8cmr"]
 
 [ext_resource type="Script" uid="uid://cmfv7ooftmf26" path="res://scripts/resources/waves/wave_data.gd" id="1_uha60"]
-[ext_resource type="PackedScene" uid="uid://dnc8437p2n4uj" path="res://scenes/enemy/enemy_types/clockwise_enemy.tscn" id="5_dpn0d"]
+[ext_resource type="PackedScene" uid="uid://c3hepjy6rfc70" path="res://scenes/enemy/enemy_types/purple_enemy.tscn" id="2_ayxtd"]
 
 [resource]
 script = ExtResource("1_uha60")
-enemies = Array[PackedScene]([ExtResource("5_dpn0d")])
+enemies = Array[PackedScene]([ExtResource("2_ayxtd")])
 metadata/_custom_type_script = "uid://cmfv7ooftmf26"
