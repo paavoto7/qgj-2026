@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://3vtjdbg00j77" path="res://scripts/ui/hud.gd" id="1_0mwgc"]
 [ext_resource type="PackedScene" uid="uid://0thmnos6u4pk" path="res://scenes/ui/game_over_screen.tscn" id="2_hqnrr"]
 [ext_resource type="PackedScene" uid="uid://cbyjmf417i3ja" path="res://scenes/ui/pause_menu.tscn" id="3_pause"]
-[ext_resource type="AudioStream" uid="uid://dddak2r5o7euk" path="res://assets/audio/ui/UI_accept.wav" id="4_8qguk"]
 
 [node name="HUD" type="Control" unique_id=1987713260]
 layout_mode = 3
@@ -22,4 +21,3 @@ offset_bottom = 23.0
 [node name="GameOverScreen" parent="." unique_id=1996190839 instance=ExtResource("2_hqnrr")]
 
 [node name="PauseMenu" parent="." unique_id=842230014 instance=ExtResource("3_pause")]
-click_sound = ExtResource("4_8qguk")

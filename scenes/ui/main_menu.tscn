@@ -1,8 +1,10 @@
 [gd_scene format=3 uid="uid://d022dj4b4bvtp"]
 
 [ext_resource type="Script" uid="uid://cqoojaxajieh8" path="res://scripts/ui/main_menu.gd" id="1_menu"]
+[ext_resource type="AudioStream" uid="uid://dddak2r5o7euk" path="res://assets/audio/ui/UI_accept.wav" id="2_fe2o3"]
 
 [node name="MainMenu" type="CanvasLayer" unique_id=1632197068 node_paths=PackedStringArray("initial_focus")]
 process_mode = 3
 script = ExtResource("1_menu")
-initial_focus = NodePath("@CenterContainer@20888/@VBoxContainer@20889/@Button@20893")
+click_sound = ExtResource("2_fe2o3")
+initial_focus = NodePath("@CenterContainer@19819/@VBoxContainer@19820/@Button@19824")
