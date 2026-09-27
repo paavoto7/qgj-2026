@@ -18,6 +18,8 @@ extends Node2D
 		queue_redraw()
 @export var dead_color: Color = Color(0.4, 0.4, 0.4)
 
+@export var powerup_sound: AudioStream = null
+
 var arena: Rect2
 var velocity: Vector2 = Vector2.ZERO
 var thread: ThreadTrail

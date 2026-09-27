@@ -23,9 +23,9 @@ func _on_collected(player: Player) -> void:
 	if not powerup_data:
 		return
 
-	var powerups: Powerups = Powerups.find_in(player)
+	var powerups: Powerups = player.powerups
 	if not powerups:
 		push_error("Player has no Powerups component, so '%s' does nothing." % powerup_data.name)
 		return
 
-	powerups.add(powerup_data)
+	powerups.collect(powerup_data)

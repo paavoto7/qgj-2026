@@ -63,3 +63,12 @@ func _expire(data: PowerupData) -> void:
 	_remaining.erase(data)
 	data.remove(_player)
 	powerup_expired.emit(data)
+
+
+func collect(data: PowerupData) -> void:
+	if not data or not is_instance_valid(_player):
+		return
+
+	add(data)
+	if _player.powerup_sound:
+		AudioManager.play_sfx_2d(_player.powerup_sound, _player.position)

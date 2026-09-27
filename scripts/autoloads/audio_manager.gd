@@ -17,6 +17,7 @@ var _sfx_2d_pool: Array[AudioStreamPlayer2D] = []
 var _sfx_3d_pool: Array[AudioStreamPlayer3D] = []
 var _music_tween: Tween
 
+var loaded: bool = false
 
 func _ready() -> void:
 	# UI sounds and music keep playing while the game is paused
@@ -34,6 +35,12 @@ func _ready() -> void:
 		_sfx_pool.append(_add_pooled_player(AudioStreamPlayer.new()))
 		_sfx_2d_pool.append(_add_pooled_player(AudioStreamPlayer2D.new()))
 		_sfx_3d_pool.append(_add_pooled_player(AudioStreamPlayer3D.new()))
+	
+	loaded = true
+
+
+func _exit_tree() -> void:
+	loaded = false
 
 
 ## Plays music, cross-fading from the current track if fade_time > 0. Does nothing if the stream is already playing.
@@ -73,6 +80,16 @@ func stop_music(fade_time: float = 0.0) -> void:
 	_music_tween.tween_callback(_music_player.stop)
 
 
+## Toggles music playback, e.g. when pausing or resuming the game.
+func set_music_playing(playing: bool) -> void:
+	if playing == _music_player.playing:
+		return
+	if playing:
+		_music_player.stream_paused = false
+	else:
+		_music_player.stream_paused = true
+
+
 func play_ui(stream: AudioStream) -> void:
 	if stream == null:
 		return
@@ -82,30 +99,32 @@ func play_ui(stream: AudioStream) -> void:
 
 
 ## Plays a non-positional one-shot sound.
-func play_sfx(stream: AudioStream, volume_db: float = 0.0, pitch_scale: float = 1.0) -> void:
+## Set ignore_pause for sounds that trigger a pause right away (e.g. a death sound before the game over screen),
+## otherwise they freeze until the game resumes.
+func play_sfx(stream: AudioStream, volume_db: float = 0.0, pitch_scale: float = 1.0, ignore_pause: bool = false) -> void:
 	if stream == null:
 		return
 
 	var player: AudioStreamPlayer = _next_free(_sfx_pool)
-	_start(player, stream, volume_db, pitch_scale)
+	_start(player, stream, volume_db, pitch_scale, ignore_pause)
 
 
-func play_sfx_2d(stream: AudioStream, position: Vector2, volume_db: float = 0.0, pitch_scale: float = 1.0) -> void:
+func play_sfx_2d(stream: AudioStream, position: Vector2, volume_db: float = 0.0, pitch_scale: float = 1.0, ignore_pause: bool = false) -> void:
 	if stream == null:
 		return
 
 	var player: AudioStreamPlayer2D = _next_free(_sfx_2d_pool)
 	player.global_position = position
-	_start(player, stream, volume_db, pitch_scale)
+	_start(player, stream, volume_db, pitch_scale, ignore_pause)
 
 
-func play_sfx_3d(stream: AudioStream, position: Vector3, volume_db: float = 0.0, pitch_scale: float = 1.0) -> void:
+func play_sfx_3d(stream: AudioStream, position: Vector3, volume_db: float = 0.0, pitch_scale: float = 1.0, ignore_pause: bool = false) -> void:
 	if stream == null:
 		return
 
 	var player: AudioStreamPlayer3D = _next_free(_sfx_3d_pool)
 	player.global_position = position
-	_start(player, stream, volume_db, pitch_scale)
+	_start(player, stream, volume_db, pitch_scale, ignore_pause)
 
 
 func _add_pooled_player(player: Node) -> Node:
@@ -127,7 +146,8 @@ func _next_free(pool: Array) -> Node:
 	return oldest
 
 
-func _start(player: Node, stream: AudioStream, volume_db: float, pitch_scale: float) -> void:
+func _start(player: Node, stream: AudioStream, volume_db: float, pitch_scale: float, ignore_pause: bool) -> void:
+	player.process_mode = Node.PROCESS_MODE_ALWAYS if ignore_pause else Node.PROCESS_MODE_PAUSABLE
 	player.stream = stream
 	player.volume_db = volume_db
 	player.pitch_scale = pitch_scale

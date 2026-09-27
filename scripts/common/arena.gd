@@ -76,6 +76,13 @@ func _ready() -> void:
 	_debug_keys = OS.has_feature("editor")
 	if _debug_keys:
 		_add_debug_actions()
+	
+	if arena_data and arena_data.background_music:
+		AudioManager.play_music(arena_data.background_music, 0.0, arena_data.music_volume_db)
+
+
+func _exit_tree() -> void:
+	AudioManager.stop_music()
 
 
 func _unhandled_input(event: InputEvent) -> void:

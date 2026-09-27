@@ -14,6 +14,7 @@ const INTRO_OFFSET: float = 12.0
 
 func open() -> void:
 	super()
+	AudioManager.set_music_playing(false)
 	_play_intro()
 
 

@@ -37,12 +37,14 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func pause() -> void:
+	AudioManager.set_music_playing(false)
 	MainManager.pause_game()
 	open()
 
 
 func resume() -> void:
 	close()
+	AudioManager.set_music_playing(true)
 	MainManager.resume_game()
 
 

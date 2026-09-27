@@ -20,7 +20,10 @@ const INTRO_STAGGER: float = 0.12
 @export var subtitle_font_size: int = 18
 @export var stats_font_size: int = 16
 @export var button_min_size: Vector2 = Vector2(240.0, 52.0)
+
 @export var click_sound: AudioStream
+@export var background_music: AudioStream
+@export var music_volume_db: float = -6.0
 
 var _background: MenuBackground
 var _start_button: Button
@@ -31,6 +34,13 @@ func _ready() -> void:
 	_background = MenuBackground.new()
 	add_child(_background)
 	_build_ui()
+	if background_music:
+		AudioManager.play_music(background_music, music_volume_db)
+
+
+func _exit_tree() -> void:
+	if AudioManager.loaded:
+		AudioManager.stop_music()
 
 
 func _unhandled_input(event: InputEvent) -> void:

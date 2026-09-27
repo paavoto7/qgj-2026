@@ -15,3 +15,6 @@ extends Resource
 ## Enemy or group scenes that random waves pick from after the scripted waves, each with a weight per wave.
 @export var random_spawns: Array[SpawnEntry] = []
 @export var max_random_enemies: int = 6
+
+@export var background_music: AudioStream = null
+@export var music_volume_db: float = -6.0
