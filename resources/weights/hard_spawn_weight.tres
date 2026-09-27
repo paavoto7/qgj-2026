@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="WaveWeight" format=3 uid="uid://52cee561pwot"]
+
+[ext_resource type="Script" uid="uid://dw56c8mjr07l7" path="res://scripts/resources/weights/wave_weight.gd" id="1_hard"]
+
+[resource]
+script = ExtResource("1_hard")
+weight = 0.5
+per_wave = 0.25
+from_wave = 9
+max_weight = 6.0
+metadata/_custom_type_script = "uid://dw56c8mjr07l7"

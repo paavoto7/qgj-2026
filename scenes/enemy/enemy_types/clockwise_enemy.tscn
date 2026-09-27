@@ -10,6 +10,11 @@ script = ExtResource("3_5cin1")
 weight = 0.5
 metadata/_custom_type_script = "uid://dw56c8mjr07l7"
 
+[sub_resource type="Resource" id="Resource_sine"]
+script = ExtResource("3_5cin1")
+per_wave = 0.1
+metadata/_custom_type_script = "uid://dw56c8mjr07l7"
+
 [node name="ClockwiseEnemy" unique_id=210352966 instance=ExtResource("1_i04ni")]
 
 [node name="Type" type="Node" parent="." index="0" unique_id=1442501842]
@@ -20,6 +25,7 @@ no_pattern_weight = SubResource("Resource_2ap8i")
 
 [node name="SineMovementPattern" type="Node2D" parent="Type" index="0" unique_id=50455171]
 script = ExtResource("3_dtl65")
+weight = SubResource("Resource_sine")
 amplitude = 200.0
 frequency = 5.0
 metadata/_custom_type_script = "uid://beb5dv5tsjwdk"

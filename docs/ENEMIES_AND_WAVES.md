@@ -122,4 +122,12 @@ Every enemy inherits a melee `Attack` from `enemy.tscn` (1 damage, 10 px reach, 
 | `wave_2.tres` | `counterclockwise_enemy` |
 | `wave_3.tres` | `enemy_pair`, `clockwise_enemy` |
 
-*Random Spawns*: `clockwise_enemy`, `counterclockwise_enemy`, `enemy_pair`, `fast_small_enemy`, `ranged_enemy`.
+*Random Spawns* use three shared weights in `resources/weights/`, so the mix gets harder over the waves. Random waves start at wave 5, after the scripted ones.
+
+| Weight | Enemies | Setting |
+| --- | --- | --- |
+| `easy_spawn_weight.tres` | `clockwise_enemy`, `counterclockwise_enemy` | 3 on every wave, so they get relatively rarer as others join. |
+| `medium_spawn_weight.tres` | `enemy_pair`, `fast_small_enemy` | From wave 6: 1, +0.3 per wave, up to 4. |
+| `hard_spawn_weight.tres` | `ranged_enemy`, `yellow_enemy`, `purple_enemy`, `white_enemy` | From wave 9: 0.5, +0.25 per wave, up to 6. |
+
+That's only easy enemies on wave 5, about half easy on wave 9, and about two thirds hard by wave 30. `clockwise_enemy`'s sine movement also gets likelier: 67% on wave 1, 85% on wave 20.

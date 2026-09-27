@@ -13,35 +13,64 @@
 [ext_resource type="Resource" uid="uid://mx10f1wxjtqu" path="res://resources/waves/wave_2.tres" id="6_8b30w"]
 [ext_resource type="PackedScene" uid="uid://c5m6bvndaofrw" path="res://scenes/enemy/enemy_types/ranged_enemy.tscn" id="6_o3407"]
 [ext_resource type="Resource" uid="uid://cq8p0tkcrr1s7" path="res://resources/waves/wave_3.tres" id="7_a27aj"]
+[ext_resource type="PackedScene" uid="uid://dhy0a5ypxupjt" path="res://scenes/enemy/enemy_types/yellow_enemy.tscn" id="8_yellow"]
+[ext_resource type="PackedScene" uid="uid://c3hepjy6rfc70" path="res://scenes/enemy/enemy_types/purple_enemy.tscn" id="9_purple"]
+[ext_resource type="PackedScene" uid="uid://clr1lmpaclh65" path="res://scenes/enemy/enemy_types/white_enemy.tscn" id="10_white"]
+[ext_resource type="Resource" uid="uid://bq72fy0khy4ka" path="res://resources/weights/easy_spawn_weight.tres" id="11_easy"]
+[ext_resource type="Resource" uid="uid://c3btu54puuvg0" path="res://resources/weights/medium_spawn_weight.tres" id="12_medium"]
+[ext_resource type="Resource" uid="uid://52cee561pwot" path="res://resources/weights/hard_spawn_weight.tres" id="13_hard"]
 
 [sub_resource type="Resource" id="Resource_cgycu"]
 script = ExtResource("2_ljb33")
 scene = ExtResource("2_3qm6e")
+weight = ExtResource("11_easy")
 metadata/_custom_type_script = "uid://gj6semq1bbrb"
 
 [sub_resource type="Resource" id="Resource_ktbfu"]
 script = ExtResource("2_ljb33")
 scene = ExtResource("3_ljb33")
+weight = ExtResource("11_easy")
 metadata/_custom_type_script = "uid://gj6semq1bbrb"
 
 [sub_resource type="Resource" id="Resource_o3407"]
 script = ExtResource("2_ljb33")
 scene = ExtResource("4_cgycu")
+weight = ExtResource("12_medium")
 metadata/_custom_type_script = "uid://gj6semq1bbrb"
 
 [sub_resource type="Resource" id="Resource_b307p"]
 script = ExtResource("2_ljb33")
 scene = ExtResource("5_ktbfu")
+weight = ExtResource("12_medium")
 metadata/_custom_type_script = "uid://gj6semq1bbrb"
 
 [sub_resource type="Resource" id="Resource_wuf1m"]
 script = ExtResource("2_ljb33")
 scene = ExtResource("6_o3407")
+weight = ExtResource("13_hard")
+metadata/_custom_type_script = "uid://gj6semq1bbrb"
+
+[sub_resource type="Resource" id="Resource_yellow"]
+script = ExtResource("2_ljb33")
+scene = ExtResource("8_yellow")
+weight = ExtResource("13_hard")
+metadata/_custom_type_script = "uid://gj6semq1bbrb"
+
+[sub_resource type="Resource" id="Resource_purple"]
+script = ExtResource("2_ljb33")
+scene = ExtResource("9_purple")
+weight = ExtResource("13_hard")
+metadata/_custom_type_script = "uid://gj6semq1bbrb"
+
+[sub_resource type="Resource" id="Resource_white"]
+script = ExtResource("2_ljb33")
+scene = ExtResource("10_white")
+weight = ExtResource("13_hard")
 metadata/_custom_type_script = "uid://gj6semq1bbrb"
 
 [resource]
 script = ExtResource("1_ed8hs")
 player_scene = ExtResource("1_36acs")
 waves = Array[ExtResource("2_36acs")]([ExtResource("4_qbr57"), ExtResource("5_f7now"), ExtResource("6_8b30w"), ExtResource("7_a27aj")])
-random_spawns = Array[ExtResource("2_ljb33")]([SubResource("Resource_cgycu"), SubResource("Resource_ktbfu"), SubResource("Resource_o3407"), SubResource("Resource_b307p"), SubResource("Resource_wuf1m")])
+random_spawns = Array[ExtResource("2_ljb33")]([SubResource("Resource_cgycu"), SubResource("Resource_ktbfu"), SubResource("Resource_o3407"), SubResource("Resource_b307p"), SubResource("Resource_wuf1m"), SubResource("Resource_yellow"), SubResource("Resource_purple"), SubResource("Resource_white")])
 metadata/_custom_type_script = "uid://k6o8lcqrwa1k"
