@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://dbietblxprcs" path="res://scenes/enemy/enemy.tscn" id="1_t4tp0"]
 [ext_resource type="PackedScene" uid="uid://bvnh5ndlh7esu" path="res://assets/projectiles/orb.tscn" id="2_bf7m5"]
-[ext_resource type="Resource" uid="uid://df362exfw8jdv" path="res://resources/droptable/test_droptable.tres" id="2_xc1s3"]
+[ext_resource type="Resource" uid="uid://dtl4355ncbjxb" path="res://resources/droptable/mid_droptable.tres" id="2_xc1s3"]
 [ext_resource type="Script" uid="uid://kik3ffojbwdy" path="res://scripts/npc/enemy_types/ranged_enemytype.gd" id="3_girxq"]
 
 [node name="RangedEnemy" unique_id=210352966 instance=ExtResource("1_t4tp0")]

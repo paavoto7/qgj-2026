@@ -1,11 +1,13 @@
 [gd_scene format=3 uid="uid://clr1lmpaclh65"]
 
 [ext_resource type="PackedScene" uid="uid://dbietblxprcs" path="res://scenes/enemy/enemy.tscn" id="1_w8qhl"]
+[ext_resource type="Resource" uid="uid://ba5u6uj86ydja" path="res://resources/droptable/rare_droptable.tres" id="2_bjksc"]
 [ext_resource type="Script" uid="uid://bt7weuflgxe55" path="res://scripts/npc/enemy_types/random_direction_type.gd" id="2_tnwha"]
 
 [node name="WhiteEnemy" unique_id=210352966 instance=ExtResource("1_w8qhl")]
 speed = 25.0
 radius = 35.0
+drop_table = ExtResource("2_bjksc")
 
 [node name="Type" type="Node" parent="." index="0" unique_id=869984590]
 script = ExtResource("2_tnwha")

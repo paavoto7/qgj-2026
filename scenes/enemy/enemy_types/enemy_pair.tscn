@@ -1,11 +1,13 @@
 [gd_scene format=3 uid="uid://b54y77jo58ion"]
 
 [ext_resource type="PackedScene" uid="uid://crg0pf132u3fl" path="res://scenes/enemy/enemy_types/paired_enemy.tscn" id="1_1cj6j"]
+[ext_resource type="Resource" uid="uid://dtl4355ncbjxb" path="res://resources/droptable/mid_droptable.tres" id="2_mgaos"]
 
 [node name="EnemyPair" type="Node2D" unique_id=231355881]
 
 [node name="PairedEnemy" parent="." unique_id=210352966 instance=ExtResource("1_1cj6j")]
 position = Vector2(-55, 0)
+drop_table = ExtResource("2_mgaos")
 
 [node name="PairedEnemy2" parent="." unique_id=1418638118 instance=ExtResource("1_1cj6j")]
 position = Vector2(55, 0)
