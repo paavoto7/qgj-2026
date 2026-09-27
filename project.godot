@@ -20,6 +20,11 @@ config/icon="res://icon.svg"
 AudioManager="*res://scripts/autoloads/audio_manager.gd"
 MainManager="*res://scripts/autoloads/main_manager.gd"
 
+[display]
+
+window/size/mode=3
+window/stretch/mode="canvas_items"
+
 [dotnet]
 
 project/assembly_name="quantum"
