@@ -7,10 +7,9 @@ extends MenuBase
 
 const ARENA_MARGIN: float = 24.0
 const PLAYER_RADIUS: float = 10.0
-const THREAD_COLOR := Color(1.0, 0.85, 0.4)
+const THREAD_COLOR := Color(1.431, 1.221, 0.586)
 
 var _visual: MenuVisual
-
 
 func _ready() -> void:
 	_visual = MenuVisual.new()
@@ -365,6 +364,8 @@ class MenuVisual extends Node2D:
 		for enemy in _enemies:
 			match enemy.state:
 				State.ALIVE:
+					if _is_green(enemy):
+						continue
 					_update_enemy_winding(enemy)
 
 				State.KNOTTING:
@@ -387,14 +388,33 @@ class MenuVisual extends Node2D:
 						enemy.fade_alpha = 1.0
 						enemy.state = State.ALIVE
 
+		_update_green_winding()
+
 
 	func _update_enemy_winding(enemy: MenuEnemy) -> void:
-		# Convert the player's signed winding into this enemy's
-		# required direction, just like EnemyType.wound_amount().
-		var along := _thread.winding_around(enemy.position) * enemy.direction
+		var current_position: Vector2 = enemy.position
 
-		if absf(along) <= WIND_TOLERANCE:
-			enemy.thread_completed_winds = 0
+		if not enemy.winding_initialized:
+			enemy.previous_player_position = _player_position
+			enemy.previous_position = current_position
+			enemy.winding_initialized = true
+			return
+
+		var previous_relative: Vector2 = enemy.previous_player_position - enemy.previous_position
+		var current_relative: Vector2 = _player_position - current_position
+
+		if previous_relative.length_squared() > 0.001 and current_relative.length_squared() > 0.001:
+			enemy.winding_total += angle_difference(
+				previous_relative.angle(),
+				current_relative.angle()
+			) / TAU
+
+		enemy.previous_player_position = _player_position
+		enemy.previous_position = current_position
+
+		var along: float = enemy.winding_total * enemy.direction
+
+		if along < 0.0:
 			enemy.progress = 0.0
 			return
 
@@ -409,6 +429,38 @@ class MenuVisual extends Node2D:
 
 		if enemy.completed_winds >= enemy.winds:
 			_kill_enemy(enemy)
+
+
+	func _update_green_winding() -> void:
+		if _green_a.state != State.ALIVE or _green_b.state != State.ALIVE:
+			return
+
+		_update_enemy_winding(_green_a)
+		_update_enemy_winding(_green_b)
+
+		var along_a: float = _green_a.winding_total * _green_a.direction
+		var along_b: float = _green_b.winding_total * _green_b.direction
+
+		var along: float = minf(along_a, along_b)
+
+		if along < 0.0:
+			_green_a.progress = 0.0
+			_green_b.progress = 0.0
+			return
+
+		var completed_in_thread := floori(along + WIND_TOLERANCE)
+
+		_green_a.progress = along - completed_in_thread
+		_green_b.progress = along - completed_in_thread
+
+		if completed_in_thread > _green_a.thread_completed_winds:
+			_green_a.completed_winds += completed_in_thread - _green_a.thread_completed_winds
+			_green_b.completed_winds += completed_in_thread - _green_b.thread_completed_winds
+			_green_a.thread_completed_winds = completed_in_thread
+			_green_b.thread_completed_winds = completed_in_thread
+
+		if _green_a.completed_winds >= _green_a.winds:
+			_kill_enemy(_green_a)
 
 
 	func _kill_enemy(enemy: MenuEnemy) -> void:
@@ -660,6 +712,12 @@ class MenuVisual extends Node2D:
 		## Fraction of the current wind, shown on the indicator ring.
 		var progress: float = 0.0
 
+		# Winding state.
+		var winding_total: float = 0.0
+		var previous_position: Vector2 = Vector2.ZERO
+		var previous_player_position: Vector2 = Vector2.ZERO
+		var winding_initialized: bool = false
+
 		var knot_progress: float = 0.0
 		var knot_rotation: float = 0.0
 		var fade_alpha: float = 1.0
@@ -686,3 +744,7 @@ class MenuVisual extends Node2D:
 			completed_winds = 0
 			thread_completed_winds = 0
 			progress = 0.0
+			winding_total = 0.0
+			previous_position = position
+			previous_player_position = Vector2.ZERO
+			winding_initialized = false

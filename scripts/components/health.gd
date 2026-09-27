@@ -55,10 +55,10 @@ func take_damage(amount: int) -> void:
 	health_changed.emit(current_health, max_health)
 	if is_dead:
 		# Dying can pause the game (game over screen), so the sound must not freeze with it
-		AudioManager.play_sfx(death_sound, 0.0, 1.0, true)
+		AudioManager.play_sfx(death_sound, -12.0, 1.0, true)
 		died.emit()
 	else:
-		AudioManager.play_sfx(hurt_sound)
+		AudioManager.play_sfx(hurt_sound, -12.0)
 
 
 func heal(amount: int) -> void:

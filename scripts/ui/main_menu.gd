@@ -37,7 +37,7 @@ func _ready() -> void:
 	add_child(_background)
 	_build_ui()
 	if background_music:
-		AudioManager.play_music(background_music, music_volume_db)
+		AudioManager.play_music(background_music, 0.0, music_volume_db)
 
 
 func _exit_tree() -> void:
@@ -103,7 +103,7 @@ func _add_label(parent: Control, text: String, font_size: int) -> Label:
 
 
 func _stats_text(data: GameData) -> String:
-	return "Best %d · %d knotted · %d runs · %d waves" % [
+	return "BEST %d · %d KNOTTED · %d RUNS · %d WAVES" % [
 		data.high_score, data.enemies_knotted, data.runs_played, data.waves_cleared
 	]
 
