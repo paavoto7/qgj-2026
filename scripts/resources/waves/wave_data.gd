@@ -5,3 +5,4 @@ extends Resource
 @export var enemies: Array[PackedScene] = []
 ## Optional text shown on the HUD during this wave, e.g. a tutorial hint.
 @export_multiline var hint: String = ""
+@export var is_test_wave: bool = false

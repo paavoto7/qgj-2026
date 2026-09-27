@@ -74,5 +74,5 @@ player_scene = ExtResource("1_36acs")
 waves = Array[ExtResource("2_36acs")]([ExtResource("5_f7now"), ExtResource("6_8b30w"), ExtResource("7_a27aj")])
 random_spawns = Array[ExtResource("2_ljb33")]([SubResource("Resource_cgycu"), SubResource("Resource_ktbfu"), SubResource("Resource_o3407"), SubResource("Resource_b307p"), SubResource("Resource_wuf1m"), SubResource("Resource_yellow"), SubResource("Resource_purple"), SubResource("Resource_white")])
 background_music = ExtResource("1_sucpw")
-music_volume_db = -17.53
+music_volume_db = -10.0
 metadata/_custom_type_script = "uid://k6o8lcqrwa1k"

@@ -8,4 +8,5 @@
 [resource]
 script = ExtResource("1_uha60")
 enemies = Array[PackedScene]([ExtResource("2_ayxtd"), ExtResource("2_dn3pd"), ExtResource("3_dn3pd")])
+is_test_wave = true
 metadata/_custom_type_script = "uid://cmfv7ooftmf26"

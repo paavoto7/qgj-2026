@@ -3,7 +3,6 @@ class_name MainMenu
 extends MenuBase
 ## Main menu: title, subtitle and buttons over a [MenuBackground].
 
-const MENU_FONT: Font = preload("res://VT323-Regular.ttf")
 const SUBTITLE_COLOR: Color = Color(1.0, 1.0, 1.0, 0.65)
 const HOVER_SCALE: Vector2 = Vector2(1.06, 1.06)
 const HOVER_TIME: float = 0.12
@@ -26,6 +25,8 @@ const INTRO_STAGGER: float = 0.12
 @export var click_sound: AudioStream
 @export var background_music: AudioStream
 @export var music_volume_db: float = -6.0
+
+@export var menu_font: Font
 
 var _background: MenuBackground
 var _start_button: Button
@@ -96,7 +97,7 @@ func _add_label(parent: Control, text: String, font_size: int) -> Label:
 	var label := Label.new()
 	label.text = text
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.add_theme_font_override("font", MENU_FONT)
+	label.add_theme_font_override("font", menu_font)
 	label.add_theme_font_size_override("font_size", font_size)
 	parent.add_child(label)
 	return label
@@ -111,7 +112,7 @@ func _stats_text(data: GameData) -> String:
 func _add_button(parent: Control, text: String, on_pressed: Callable) -> Button:
 	var button := Button.new()
 	button.text = text
-	button.add_theme_font_override("font", MENU_FONT)
+	button.add_theme_font_override("font", menu_font)
 	button.add_theme_font_size_override("font_size", button_font_size)
 	button.custom_minimum_size = button_min_size
 	button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
