@@ -30,8 +30,10 @@ func wound_amount(windings: Dictionary[Enemy, float]) -> float:
 
 
 func on_wind_completed() -> void:
-	# The direction flips, so the next wind starts from scratch
+	# The direction flips, so the next wind starts from scratch. The enemy resets
+	# its winding to 0 for the new direction, so the baseline starts there too.
 	_progress = 0.0
+	_last_winding = 0.0
 
 
 func direction() -> float:

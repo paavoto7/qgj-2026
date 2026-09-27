@@ -159,7 +159,7 @@ func evaluate(windings: Dictionary[Enemy, float]) -> bool:
 		type.on_wind_completed()
 
 	# Progress only represents the currently unfinished wind.
-	_progress = along - completed_in_thread
+	_progress = maxf(along - completed_in_thread, 0.0)
 
 	return _completed_winds >= needed
 
@@ -223,9 +223,18 @@ func update_winding(player_position: Vector2) -> void:
 			current_relative.angle()
 		) / TAU
 
+	# Winding the wrong way doesn't build up debt. Turning around counts straight away.
+	# The total is signed, so flip it to the needed direction, drop the wrong-way part and flip it back.
+	# TODO: store progress in the needed direction instead, so this and every type's `* direction()` go away.
+	if is_instance_valid(type):
+		var direction: float = type.direction()
+		_winding_total = maxf(_winding_total * direction, 0.0) * direction
+
 	_previous_player_position = player_position
 	_previous_position = current_position
 
 
+## Signed turns of the player around the enemy: positive is clockwise, negative counterclockwise.
+## Never goes past 0 the wrong way. The EnemyType turns it into progress with [method EnemyType.direction].
 func get_winding_total() -> float:
 	return _winding_total
