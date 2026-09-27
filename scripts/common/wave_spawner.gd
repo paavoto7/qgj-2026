@@ -32,6 +32,16 @@ func next_wave() -> void:
 	wave_started.emit(_current_wave_data(), _wave)
 
 
+## Removes the current enemies and starts the given wave, e.g. for testing.
+func go_to_wave(number: int) -> void:
+	for enemy: Enemy in enemies:
+		if is_instance_valid(enemy):
+			enemy.queue_free()
+	enemies.clear()
+	_wave = maxi(number, 1) - 1
+	next_wave()
+
+
 ## Adds an enemy to the arena and tracks it. Enemies it spawns, e.g. by splitting, are added too,
 ## and items it drops are passed on through item_dropped.
 func add_enemy(enemy: Enemy) -> void:

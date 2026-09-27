@@ -78,6 +78,8 @@ When no existing type fits the rule you want:
 
 To change an existing wave, open its `.tres` file and edit it. The arena picks the change up automatically.
 
+**Test keys:** when the game is run from the editor, *Tab* starts the next wave and the number keys go to that wave (*1*-*9*, *0* for wave 10). The current enemies are removed first. Runs that used them don't record a high score. They're off in exported builds.
+
 ## Wave-based weights
 A **`WaveWeight`** (`scripts/resources/weights/wave_weight.gd`) is a Resource that says how likely something is on a given wave, compared to the other options it's picked from. It's used for random spawns, movement patterns and drops (see [ITEMS_AND_POWERUPS.md](ITEMS_AND_POWERUPS.md)). An empty weight slot counts as 1 on every wave, so leaving them all empty gives an even pick.
 

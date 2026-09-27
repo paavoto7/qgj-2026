@@ -4,9 +4,13 @@ extends Node2D
 ## Combat arena. Circle enemies with your thread to knot them. Spawns the player from its ArenaData,
 ## wires up the WaveSpawner, ScoreKeeper and HUD children, and knots enemies the player's thread winds around.
 ## A tool script so the border is drawn in the editor. Gameplay code is skipped there.
+## Test keys, only when the game is run from the editor: Tab starts the next wave, 1-9 go to that wave and 0 to wave 10.
 
 ## Margin used in the editor when no Arena Data is assigned.
 const DEFAULT_MARGIN: float = 24.0
+const DEBUG_NEXT_WAVE: StringName = &"debug_next_wave"
+const DEBUG_WAVE_PREFIX: String = "debug_wave_"
+const DEBUG_WAVE_KEYS: int = 10
 
 @export var arena_data: ArenaData:
 	set(value):
@@ -15,6 +19,9 @@ const DEFAULT_MARGIN: float = 24.0
 
 var _arena: Rect2
 var _player: Player
+var _debug_keys: bool = false
+## Runs that used the test keys aren't recorded.
+var _used_debug_keys: bool = false
 
 @onready var _spawner: WaveSpawner = $WaveSpawner
 @onready var _score_keeper: ScoreKeeper = $ScoreKeeper
@@ -65,6 +72,24 @@ func _ready() -> void:
 	_spawner.wave_started.connect(_hud.show_wave)
 	_spawner.item_dropped.connect(_on_item_dropped)
 	_spawner.next_wave()
+
+	_debug_keys = OS.has_feature("editor")
+	if _debug_keys:
+		_add_debug_actions()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not _debug_keys:
+		return
+
+	if event.is_action_pressed(DEBUG_NEXT_WAVE):
+		_debug_go_to_wave(_spawner.wave + 1)
+		return
+
+	for number: int in range(1, DEBUG_WAVE_KEYS + 1):
+		if event.is_action_pressed(DEBUG_WAVE_PREFIX + str(number)):
+			_debug_go_to_wave(number)
+			return
 
 
 func _physics_process(_delta: float) -> void:
@@ -117,8 +142,35 @@ func _on_player_died() -> void:
 	# The wave the player died on wasn't cleared
 	var waves_cleared: int = maxi(_spawner.wave - 1, 0)
 	var score: int = _score_keeper.score
-	var is_new_high_score: bool = MainManager.game_data.record_run(score, _score_keeper.knots, waves_cleared)
-	MainManager.save_game_data()
+	var is_new_high_score: bool = false
+	if not _used_debug_keys:
+		is_new_high_score = MainManager.game_data.record_run(score, _score_keeper.knots, waves_cleared)
+		MainManager.save_game_data()
 
 	_hud.show_game_over(score, is_new_high_score)
 	MainManager.pause_game()
+
+
+## Registers the test keys as input actions, so they don't need to be in the project's Input Map.
+func _add_debug_actions() -> void:
+	_add_debug_action(DEBUG_NEXT_WAVE, KEY_TAB)
+	for number: int in range(1, DEBUG_WAVE_KEYS + 1):
+		# 1-9 on the number row, 0 for wave 10
+		_add_debug_action(DEBUG_WAVE_PREFIX + str(number), (KEY_0 + number % 10) as Key)
+
+
+func _add_debug_action(action: StringName, key: Key) -> void:
+	if InputMap.has_action(action):
+		return
+
+	var event := InputEventKey.new()
+	event.physical_keycode = key
+	InputMap.add_action(action)
+	InputMap.action_add_event(action, event)
+
+
+func _debug_go_to_wave(number: int) -> void:
+	get_viewport().set_input_as_handled()
+	_used_debug_keys = true
+	_player.thread.clear()
+	_spawner.go_to_wave(number)
