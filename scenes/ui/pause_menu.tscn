@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://uvx5mkyoq4da" path="res://scripts/ui/pause_menu.gd" id="1_script"]
 [ext_resource type="AudioStream" uid="uid://dddak2r5o7euk" path="res://assets/audio/ui/UI_accept.wav" id="2_f6eus"]
 [ext_resource type="Theme" uid="uid://dxw7j24uanr8r" path="res://resources/ui/overlay_theme.tres" id="2_theme"]
-[ext_resource type="FontFile" uid="uid://db0jpf5pcmmx4" path="res://VT323-Regular.ttf" id="4_8uki6"]
+[ext_resource type="FontFile" uid="uid://db0jpf5pcmmx4" path="res://assets/fonts/VT323-Regular.ttf" id="4_8uki6"]
 
 [node name="PauseMenu" type="CanvasLayer" unique_id=1263157142 node_paths=PackedStringArray("initial_focus")]
 visible = false

@@ -104,8 +104,8 @@ func _update_hud() -> void:
 		_combo_label.text = ""
 
 	_pause_menu.show_run(_score, _wave_number)
-	
-	
+
+
 func _fade_combo_out() -> void:
 	var tween := create_tween()
 	tween.set_parallel(true)
