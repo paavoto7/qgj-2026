@@ -4,28 +4,18 @@ extends Resource
 
 ## Chance that anything drops at all.
 @export_range(0.0, 1.0) var drop_chance: float = 0.3
-## Picked from by rarity weight when something drops.
+## Picked from by weight when something drops.
 @export var drops: Array[Droppable] = []
 
 
-## Returns the item scene to drop, or null if nothing drops this time.
-func roll() -> PackedScene:
+## Returns the item scene to drop on the given wave, or null if nothing drops this time.
+func roll(wave: int) -> PackedScene:
 	if drops.is_empty() or randf() >= drop_chance:
 		return null
 
-	var total: int = 0
+	var weights := PackedFloat32Array()
 	for droppable: Droppable in drops:
-		if droppable:
-			total += droppable.weight
-	if total <= 0:
-		return null
+		weights.append(droppable.get_weight(wave) if droppable else 0.0)
 
-	var pick: int = randi_range(1, total)
-	for droppable: Droppable in drops:
-		if not droppable:
-			continue
-		pick -= droppable.weight
-		if pick <= 0:
-			return droppable.item_scene
-
-	return null
+	var index: int = WeightedRandom.pick_index(weights)
+	return drops[index].item_scene if index >= 0 else null

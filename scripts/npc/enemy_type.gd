@@ -12,9 +12,12 @@ extends Node
 @export var winds: int = 1
 ## Which way to wind. Flips the rings and arrow too.
 @export var clockwise: bool = true
-## How the enemy moves. None means it chases the target by default.
-@export var movement_pattern: MovementPattern = null
+## How likely the enemy is to just chase, compared to the weights of its MovementPattern children.
+## Empty means a weight of 1 on every wave.
+@export var no_pattern_weight: WaveWeight = null
 
+## How the enemy moves, picked from the MovementPattern children when it spawns. Null means it just chases.
+var movement_pattern: MovementPattern = null
 var enemy: Enemy:
 	get:
 		return get_parent() as Enemy
@@ -29,11 +32,27 @@ static func find_in(node: Node) -> EnemyType:
 	return null
 
 
-func _ready() -> void:
-	if movement_pattern:
-		# Simple probability-based removal of the movement pattern, so the enemy doesn't always move the same way.
-		if randf_range(0.0, 1.0) > movement_pattern.probability:
-			movement_pattern.queue_free()
+## Picks one MovementPattern child, or none, by their weights on the given wave and frees the rest.
+## Called by the Enemy when it's ready, so it works even if a subclass overrides _ready.
+func pick_movement_pattern(wave: int) -> void:
+	var patterns: Array[MovementPattern] = []
+	var weights := PackedFloat32Array()
+	for child: Node in get_children():
+		var pattern: MovementPattern = child as MovementPattern
+		if pattern:
+			patterns.append(pattern)
+			weights.append(WeightedRandom.weight_of(pattern.weight, wave))
+	if patterns.is_empty():
+		return
+
+	# The last slot is plain chasing
+	weights.append(WeightedRandom.weight_of(no_pattern_weight, wave))
+	var index: int = WeightedRandom.pick_index(weights)
+	movement_pattern = patterns[index] if index >= 0 and index < patterns.size() else null
+
+	for pattern: MovementPattern in patterns:
+		if pattern != movement_pattern:
+			pattern.queue_free()
 
 
 ## How many winds the thread has made around the enemy in the direction it needs.

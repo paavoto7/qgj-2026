@@ -22,6 +22,8 @@ const RING_SPACING: float = 5.0
 @export var drop_table: DropTable = null
 
 var target: Node2D
+## The wave the enemy spawned on, set by the WaveSpawner. Used for wave-based weights.
+var wave: int = 0
 var is_knotted: bool = false
 var color: Color:
 	get:
@@ -48,6 +50,7 @@ func _ready() -> void:
 
 	speed = type.get_speed()
 	radius = type.get_radius()
+	type.pick_movement_pattern(wave)
 
 
 func _physics_process(delta: float) -> void:
@@ -180,7 +183,7 @@ func _drop_item() -> void:
 	if not drop_table:
 		return
 
-	var scene: PackedScene = drop_table.roll()
+	var scene: PackedScene = drop_table.roll(wave)
 	if not scene:
 		return
 
