@@ -1,10 +1,13 @@
 [gd_resource type="Resource" script_class="SpeedPowerup" format=3 uid="uid://byhnspubt2h1v"]
 
 [ext_resource type="Script" uid="uid://pmojt5d3pj4k" path="res://scripts/resources/items/powerups/speed_powerup.gd" id="1_0bm2p"]
-[ext_resource type="Texture2D" uid="uid://byi5xu27wekf8" path="res://icon.svg" id="2_113qa"]
+[ext_resource type="Texture2D" uid="uid://bv55kklrc5gyd" path="res://assets/images/QGJ26_powerups.png" id="2_113qa"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xloxd"]
+atlas = ExtResource("2_113qa")
+region = Rect2(144, 0, 72, 72)
 
 [resource]
 script = ExtResource("1_0bm2p")
-sprite = ExtResource("2_113qa")
-color = Color(0.7613269, 0.6228202, 0, 1)
+sprite = SubResource("AtlasTexture_xloxd")
 metadata/_custom_type_script = "uid://pmojt5d3pj4k"
