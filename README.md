@@ -1,12 +1,8 @@
-# qgj-2026
-Game for Quantum Game Jam 2026.
+# Knot today (QGJ-2026)
+Game made for the [Quantum Game Jam 2026](https://itch.io/jam/quantum-game-jam-2026). Game can be found at [itch.io](https://borje1.itch.io/knot-today)
 
-- Engine: Godot **4.7.2**, .NET build (GDScript and C#).
+- Engine: Godot **4.7.2**
 - Getting started and commit workflow: [CONTRIBUTING.md](CONTRIBUTING.md).
-- Setting up the project at jam start: [docs/JAM_START.md](docs/JAM_START.md).
-- Adding enemies and waves: [docs/ENEMIES_AND_WAVES.md](docs/ENEMIES_AND_WAVES.md).
-- Items, powerups and drop chances: [docs/ITEMS_AND_POWERUPS.md](docs/ITEMS_AND_POWERUPS.md).
-- Planned enemy type cleanup: [docs/ENEMY_TYPE_CLEANUP_PLAN.md](docs/ENEMY_TYPE_CLEANUP_PLAN.md).
 
 ## Theme
 The theme of the year is *quantum braiding*.
