@@ -10,6 +10,6 @@ process_mode = 3
 script = ExtResource("1_menu")
 click_sound = ExtResource("2_fe2o3")
 background_music = ExtResource("3_1g8jr")
-music_volume_db = -10.0
+music_volume_db = -12.0
 menu_font = ExtResource("4_m1kxf")
 initial_focus = NodePath("@CenterContainer@20632/@VBoxContainer@20633/@Button@20637")

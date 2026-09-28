@@ -8,7 +8,6 @@
 [ext_resource type="Script" uid="uid://gj6semq1bbrb" path="res://scripts/resources/waves/spawn_entry.gd" id="2_ljb33"]
 [ext_resource type="PackedScene" uid="uid://dn35743gscsgg" path="res://scenes/enemy/enemy_types/counterclockwise_enemy.tscn" id="3_ljb33"]
 [ext_resource type="PackedScene" uid="uid://b54y77jo58ion" path="res://scenes/enemy/enemy_types/enemy_pair.tscn" id="4_cgycu"]
-[ext_resource type="Resource" uid="uid://lt2o3dka8cmr" path="res://resources/waves/testwave.tres" id="4_qbr57"]
 [ext_resource type="Resource" uid="uid://dju6a6wolb4qo" path="res://resources/waves/wave_1.tres" id="5_f7now"]
 [ext_resource type="PackedScene" uid="uid://ductckbu25n13" path="res://scenes/enemy/enemy_types/fast_small_enemy.tscn" id="5_ktbfu"]
 [ext_resource type="Resource" uid="uid://mx10f1wxjtqu" path="res://resources/waves/wave_2.tres" id="6_8b30w"]
@@ -72,7 +71,7 @@ metadata/_custom_type_script = "uid://gj6semq1bbrb"
 [resource]
 script = ExtResource("1_ed8hs")
 player_scene = ExtResource("1_36acs")
-waves = Array[ExtResource("2_36acs")]([ExtResource("4_qbr57"), ExtResource("5_f7now"), ExtResource("6_8b30w"), ExtResource("7_a27aj")])
+waves = Array[ExtResource("2_36acs")]([ExtResource("5_f7now"), ExtResource("6_8b30w"), ExtResource("7_a27aj")])
 random_spawns = Array[ExtResource("2_ljb33")]([SubResource("Resource_cgycu"), SubResource("Resource_ktbfu"), SubResource("Resource_o3407"), SubResource("Resource_b307p"), SubResource("Resource_wuf1m"), SubResource("Resource_yellow"), SubResource("Resource_purple"), SubResource("Resource_white")])
 background_music = ExtResource("1_sucpw")
 music_volume_db = -10.0

@@ -71,4 +71,4 @@ func collect(data: PowerupData) -> void:
 
 	add(data)
 	if _player.powerup_sound:
-		AudioManager.play_sfx_2d(_player.powerup_sound, _player.position)
+		AudioManager.play_sfx_2d(_player.powerup_sound, _player.position, -6.0)
