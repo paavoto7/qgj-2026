@@ -66,6 +66,8 @@ func heal(amount: int) -> void:
 		return
 
 	var healed_amount: int = min(amount, max_health - current_health)
+	if healed_amount <= 0:
+		return
 	current_health += healed_amount
 	healed.emit(healed_amount)
 	health_changed.emit(current_health, max_health)

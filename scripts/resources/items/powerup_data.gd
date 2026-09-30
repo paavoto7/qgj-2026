@@ -6,8 +6,6 @@ extends Resource
 
 @export var name: String
 @export var sprite: Texture2D
-## Tints the pickup. Also its colour when there is no sprite.
-@export var color: Color = Color.WHITE
 ## Seconds the effect lasts. 0 makes it instant, so remove() is never called.
 @export var duration: float = 0.0
 

@@ -19,6 +19,7 @@
 [ext_resource type="Resource" uid="uid://bq72fy0khy4ka" path="res://resources/weights/easy_spawn_weight.tres" id="11_easy"]
 [ext_resource type="Resource" uid="uid://c3btu54puuvg0" path="res://resources/weights/medium_spawn_weight.tres" id="12_medium"]
 [ext_resource type="Resource" uid="uid://52cee561pwot" path="res://resources/weights/hard_spawn_weight.tres" id="13_hard"]
+[ext_resource type="Resource" uid="uid://lt2o3dka8cmr" path="res://resources/waves/testwave.tres" id="17_sucpw"]
 
 [sub_resource type="Resource" id="Resource_cgycu"]
 script = ExtResource("2_ljb33")
@@ -71,7 +72,7 @@ metadata/_custom_type_script = "uid://gj6semq1bbrb"
 [resource]
 script = ExtResource("1_ed8hs")
 player_scene = ExtResource("1_36acs")
-waves = Array[ExtResource("2_36acs")]([ExtResource("5_f7now"), ExtResource("6_8b30w"), ExtResource("7_a27aj")])
+waves = Array[ExtResource("2_36acs")]([ExtResource("17_sucpw"), ExtResource("5_f7now"), ExtResource("6_8b30w"), ExtResource("7_a27aj")])
 random_spawns = Array[ExtResource("2_ljb33")]([SubResource("Resource_cgycu"), SubResource("Resource_ktbfu"), SubResource("Resource_o3407"), SubResource("Resource_b307p"), SubResource("Resource_wuf1m"), SubResource("Resource_yellow"), SubResource("Resource_purple"), SubResource("Resource_white")])
 background_music = ExtResource("1_sucpw")
 music_volume_db = -10.0
