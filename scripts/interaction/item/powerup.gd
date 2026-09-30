@@ -1,6 +1,6 @@
 class_name Powerup
 extends Item
-## Item that gives the player a powerup. Shows the powerup's sprite and colour on a sibling Sprite2D.
+## Item that gives the player a powerup. Shows the powerup's sprite on a sibling Sprite2D.
 
 @export var powerup_data: PowerupData
 
@@ -13,10 +13,8 @@ func _ready() -> void:
 		push_error("Powerup '%s' has no Powerup Data." % area.name)
 		return
 
-	if is_instance_valid(_sprite):
-		if powerup_data.sprite:
-			_sprite.texture = powerup_data.sprite
-		_sprite.modulate = powerup_data.color
+	if is_instance_valid(_sprite) and powerup_data.sprite:
+		_sprite.texture = powerup_data.sprite
 
 
 func _on_collected(player: Player) -> void:
