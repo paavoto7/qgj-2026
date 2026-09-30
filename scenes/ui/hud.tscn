@@ -4,6 +4,7 @@
 [ext_resource type="FontFile" uid="uid://db0jpf5pcmmx4" path="res://assets/fonts/VT323-Regular.ttf" id="2_8qguk"]
 [ext_resource type="PackedScene" uid="uid://0thmnos6u4pk" path="res://scenes/ui/game_over_screen.tscn" id="2_hqnrr"]
 [ext_resource type="PackedScene" uid="uid://cbyjmf417i3ja" path="res://scenes/ui/pause_menu.tscn" id="3_pause"]
+[ext_resource type="Script" uid="uid://cmwmkcvb3axtk" path="res://scripts/ui/powerup_display.gd" id="4_powerupdisplay"]
 
 [node name="HUD" type="Control" unique_id=1987713260]
 layout_mode = 3
@@ -37,6 +38,12 @@ theme_override_font_sizes/bold_italics_font_size = 24
 theme_override_font_sizes/italics_font_size = 24
 theme_override_font_sizes/mono_font_size = 24
 bbcode_enabled = true
+
+[node name="PowerupDisplay" type="VBoxContainer" parent="." unique_id=364098965]
+layout_mode = 0
+mouse_filter = 2
+theme_override_constants/separation = 4
+script = ExtResource("4_powerupdisplay")
 
 [node name="GameOverScreen" parent="." unique_id=1996190839 instance=ExtResource("2_hqnrr")]
 

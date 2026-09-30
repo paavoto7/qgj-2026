@@ -5,10 +5,6 @@ extends PowerupData
 @export var multiplier: float = 1.5
 
 
-func _init() -> void:
-	duration = 5.0
-
-
 func apply(player: Player) -> void:
 	player.speed *= multiplier
 

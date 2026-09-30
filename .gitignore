@@ -27,3 +27,6 @@ builds/
 
 .vscode/
 exports/
+
+# Local project setting overrides (editor-only debug autoloads)
+override.cfg

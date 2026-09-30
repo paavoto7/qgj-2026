@@ -8,6 +8,7 @@ Reusable scripts under `scripts/`, taken from our GGJ 2026 project and cleaned u
 | `game_data.gd` | `GameData` resource saved to `user://`. Add the game's save fields as `@export` variables. |
 | `state_machine/state_machine.gd`, `state_base.gd` | Code-driven state machine. Extend `StateBase` with a `class_name` and switch with `change_state(&"ClassName")`. |
 | `ui/menu_base.gd` | Base for menus. Shows the cursor while open, works while paused and focuses a control for controller navigation. |
+| `ui/powerup_display.gd` | `PowerupDisplay` stack of icons for active timed powerups in the HUD corner. `bind()` it to the player's `Powerups`. |
 | `components/health.gd` | `Health` child node with damage, healing, invulnerability frames, sounds and signals. |
 | `components/damage_zone.gd` | Child of an `Area2D`/`Area3D`. Damages bodies with a `Health`, once or repeatedly. |
 | `interaction/interactable.gd` | Child of an `Area2D`/`Area3D`. Emits `interacted` or can be extended by overriding `interact()`. `interact_on_touch` makes it trigger on overlap, e.g. for pickups. |
