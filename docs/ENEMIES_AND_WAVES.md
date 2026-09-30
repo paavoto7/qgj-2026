@@ -3,15 +3,14 @@ How enemies are built and how to add new enemies and waves. Everything except a 
 
 ## How it fits together
 - **`Enemy`** (`scripts/npc/enemy.gd`) is the shared enemy: chasing the player, drawing the rings and arrow, checking the thread's winding and the knot animation. Its scene is `scenes/enemy/enemy.tscn`.
-- **`EnemyType`** (`scripts/npc/enemy_type.gd`) is a component, a child node of the `Enemy`, like a Unity component. It decides how the winding counts and which way to wind. Every enemy has exactly one. All types have *Color*, *Winds* (how many winds knot it, 1 by default) and *Clockwise* (which way to wind, on by default), set on the `Type` node in each enemy scene. On its own, `EnemyType` is the plain rule, and most enemies use it directly. Subclasses in `scripts/npc/enemy_types/` change the rule:
+- **`EnemyType`** (`scripts/npc/enemy_type.gd`) is a component, a child node of the `Enemy`, like a Unity component. It decides how the winding counts and which way to wind. Every enemy has exactly one. All types have *Color*, *Winds* (how many winds knot it, 1 by default) and *Wind Direction* (*Clockwise* by default, *Counterclockwise*, or *Random*, which picks one when the enemy is created), set on the `Type` node in each enemy scene. On its own, `EnemyType` is the plain rule, and most enemies use it directly. Subclasses in `scripts/npc/enemy_types/` change the rule:
 
   | Type | Rule |
   | --- | --- |
-  | `EnemyType` | Wind *Winds* times in the *Clockwise* direction. Set *Speed*, *Radius* and the `Attack` on the scene for the rest. |
-  | `PairedType` | Linked to a partner. Loop around both *Winds* times, in either direction. |
-  | `PurpleType` | Wind *Required Winds* times (3 by default), switching direction after each wind. The first direction is random. |
-  | `RandomDirectionType` | Wind *Winds* times in a random direction, picked when it spawns. |
-  | `YellowType` | Like `RandomDirectionType`. When knotted, it splits into two smaller, faster copies that don't split again. |
+  | `EnemyType` | Wind *Winds* times in the *Wind Direction*. Set *Speed*, *Radius* and the `Attack` on the scene for the rest. |
+  | `PairedType` | Linked to a partner. Loop around both *Winds* times. The partner takes over the first enemy's direction. |
+  | `PurpleType` | Wind *Winds* times, switching direction after each wind. *Wind Direction* is the first one. |
+  | `YellowType` | When knotted, it splits into two smaller, faster copies that don't split again. |
 
 - **Enemy scenes** inherit `enemy.tscn` and add a type component, like a Unity prefab variant. They're in `scenes/enemy/enemy_types/`.
 - **Group scenes** are a plain `Node2D` with enemy scenes as children, e.g. `scenes/enemy/enemy_types/enemy_pair.tscn`. They spawn together and keep their layout.
@@ -30,7 +29,7 @@ For example, a clockwise enemy that needs 3 winds:
 5. Add it to a wave, or as a `SpawnEntry` to *Random Spawns* in the arena's `ArenaData`.
 
 ## Add a new enemy type
-When the rule itself is different, not just *Winds*, *Clockwise*, *Speed*, *Radius* or the `Attack`:
+When the rule itself is different, not just *Winds*, *Wind Direction*, *Speed*, *Radius* or the `Attack`:
 1. Create `scripts/npc/enemy_types/<name>_type.gd` (e.g. `spiral_type.gd`) that extends `EnemyType`:
    ```gdscript
    @tool
@@ -40,7 +39,7 @@ When the rule itself is different, not just *Winds*, *Clockwise*, *Speed*, *Radi
    ```
    Keep the `@tool` line. It makes the enemy draw in the editor, which calls the type's methods. `@tool` isn't inherited, so every type script needs its own. Anything that shouldn't run in the editor goes behind `if Engine.is_editor_hint(): return`.
 
-   *Color*, *Winds* and *Clockwise* come from `EnemyType`. Don't declare them again in the new type, set them in its scene instead.
+   *Color*, *Winds* and *Wind Direction* come from `EnemyType`. Don't declare them again in the new type, set them in its scene instead.
 2. Override the methods your rule needs. The type's enemy is available as `enemy`.
 
    | Method | Default | Use it for |
@@ -48,9 +47,7 @@ When the rule itself is different, not just *Winds*, *Clockwise*, *Speed*, *Radi
    | `wound_amount(windings) -> float` | winding in the `direction()` direction | How many winds the thread has made in the direction this enemy needs. `windings` has the winding around every enemy in the arena, positive = clockwise. The enemy is knotted once this reaches `winds_needed()`. |
    | `get_color() -> Color` | *Color* | A colour that changes, e.g. with state. |
    | `winds_needed() -> int` | *Winds* | Number of rings, and winds needed to knot. |
-   | `get_speed() -> float` | the enemy's *Speed* | A different chase speed, applied when the enemy is ready. |
-   | `get_radius() -> float` | the enemy's *Radius* | A different size, applied when the enemy is ready. |
-   | `direction() -> float` | *Clockwise* as `1.0` / `-1.0` | `1.0` clockwise, `-1.0` counterclockwise. Flips the rings and arrow. Multiply by it in your own `wound_amount` so the rule follows *Clockwise*. |
+   | `direction() -> float` | *Wind Direction* as `1.0` / `-1.0` | `1.0` clockwise, `-1.0` counterclockwise. Flips the rings and arrow. Multiply by it in your own `wound_amount` so the rule follows *Wind Direction*. |
    | `steer(velocity) -> Vector2` | chase the player | Different movement. Return the new velocity. |
    | `on_spawned(group)` | nothing | Setup that needs the other enemies from the same scene, like `PairedType` linking up. |
    | `on_wind_completed()` | nothing | Something that happens after each full wind, like `PurpleType` switching direction. |
@@ -101,13 +98,13 @@ All scenes are in `scenes/enemy/enemy_types/`.
 | --- | --- |
 | `clockwise_enemy.tscn` | `EnemyType`, 2 winds clockwise |
 | `counterclockwise_enemy.tscn` | `EnemyType`, 1 wind counterclockwise |
-| `paired_enemy.tscn` | `PairedType`. Only spawn it inside a group, alone it has no partner. |
+| `paired_enemy.tscn` | `PairedType`, random direction. Only spawn it inside a group, alone it has no partner. |
 | `enemy_pair.tscn` | Group of two `paired_enemy` |
 | `fast_small_enemy.tscn` | `EnemyType`, 1 wind clockwise. *Speed* 165 and *Radius* 8, 3× the default speed and half the size. |
-| `yellow_enemy.tscn` | `YellowType`, splits into two when knotted |
+| `yellow_enemy.tscn` | `YellowType`, 1 wind in a random direction, splits into two when knotted |
 | `ranged_enemy.tscn` | `EnemyType`, 1 wind clockwise. Its `Attack` is ranged: shoots `scenes/projectiles/orb.tscn` from 400 px away. |
-| `purple_enemy.tscn` | `PurpleType`, 3 winds, switching direction after each |
-| `white_enemy.tscn` | `RandomDirectionType`, 4 winds. Big and slow: *Speed* 25, *Radius* 35. |
+| `purple_enemy.tscn` | `PurpleType`, 3 winds, random first direction, switching after each |
+| `white_enemy.tscn` | `EnemyType`, 4 winds in a random direction. Big and slow: *Speed* 25, *Radius* 35. |
 
 Every enemy inherits a melee `Attack` from `enemy.tscn` (1 damage, 10 px reach, 0.5 s cooldown), which `ranged_enemy.tscn` overrides.
 

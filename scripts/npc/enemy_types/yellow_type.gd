@@ -1,8 +1,7 @@
 @tool
 class_name YellowType
-extends RandomDirectionType
+extends EnemyType
 ## A normal enemy that splits into two smaller, faster enemies when knotted.
-## Its winding direction is randomly chosen when spawned.
 
 const CHILD_RADIUS_SCALE: float = 0.6
 const CHILD_SPEED_MULTIPLIER: float = 3.0

@@ -7,7 +7,6 @@ extends EnemyType
 const PAIR_DISTANCE: float = 110.0
 
 var partner: PairedType
-var _direction: float = 1.0
 
 
 ## Links two paired enemies as partners of each other.
@@ -21,30 +20,26 @@ func has_partner() -> bool:
 
 
 func wound_amount(windings: Dictionary[Enemy, float]) -> float:
-	var winding: float = windings.get(enemy, 0.0) * _direction
+	var winding: float = windings.get(enemy, 0.0) * direction()
 	if not has_partner():
 		return maxf(winding, 0.0)
 
 	# Both must be wound in the chosen direction, so a loop around the pair counts but a figure eight doesn't.
-	var partner_winding: float = windings.get(partner.enemy, 0.0) * _direction
+	var partner_winding: float = windings.get(partner.enemy, 0.0) * direction()
 	if winding < 0.0 or partner_winding < 0.0:
 		return 0.0
 	return minf(winding, partner_winding)
 
 
-## Links with the other paired enemy spawned from the same scene.
+## Links with the other paired enemy spawned from the same scene. The partner takes over this enemy's direction.
 func on_spawned(group: Array[Enemy]) -> void:
 	for other: Enemy in group:
 		var other_type := other.type as PairedType
 		if other_type and other_type != self and not other_type.has_partner():
-			_direction = 1.0 if randf() < 0.5 else -1.0
 			link(self, other_type)
-			other_type._direction = _direction
+			other_type.wind_direction = wind_direction
+			other_type._random_direction = _random_direction
 			return
-
-
-func direction() -> float:
-	return _direction
 
 
 func draw_extras() -> void:
