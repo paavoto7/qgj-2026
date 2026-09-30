@@ -1,6 +1,6 @@
 @tool
 class_name YellowType
-extends EnemyType
+extends RandomDirectionType
 ## A normal enemy that splits into two smaller, faster enemies when knotted.
 ## Its winding direction is randomly chosen when spawned.
 
@@ -9,25 +9,9 @@ const CHILD_SPEED_MULTIPLIER: float = 3.0
 const CHILD_BURST_TIME: float = 0.35
 const CHILD_BURST_STRENGTH: float = 2.5
 
-var _direction: float = 1.0
 var _can_split: bool = true
 var _burst_direction: Vector2 = Vector2.ZERO
 var _burst_timer: float = 0.0
-
-
-func _ready() -> void:
-	if Engine.is_editor_hint():
-		return
-
-	_direction = 1.0 if randf() < 0.5 else -1.0
-
-
-func wound_amount(windings: Dictionary[Enemy, float]) -> float:
-	return windings.get(enemy, 0.0) * _direction
-
-
-func direction() -> float:
-	return _direction
 
 
 func steer(velocity: Vector2) -> Vector2:

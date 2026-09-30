@@ -13,9 +13,5 @@ func _ready() -> void:
 	_direction = 1.0 if randf() < 0.5 else -1.0
 
 
-func wound_amount(windings: Dictionary[Enemy, float]) -> float:
-	return windings.get(enemy, 0.0) * _direction
-
-
 func direction() -> float:
 	return _direction

@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dn35743gscsgg"]
 
 [ext_resource type="PackedScene" uid="uid://dbietblxprcs" path="res://scenes/enemy/enemy.tscn" id="1_xeuus"]
-[ext_resource type="Script" uid="uid://bsra2dcmw78xa" path="res://scripts/npc/enemy_types/counterclockwise_type.gd" id="2_0mabj"]
+[ext_resource type="Script" uid="uid://c7qd5ghy1unjm" path="res://scripts/npc/enemy_type.gd" id="2_0mabj"]
 [ext_resource type="Resource" uid="uid://dtl4355ncbjxb" path="res://resources/droptable/mid_droptable.tres" id="2_sxjrl"]
 
 [node name="CounterclockwiseEnemy" unique_id=210352966 instance=ExtResource("1_xeuus")]

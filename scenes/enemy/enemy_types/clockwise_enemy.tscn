@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://dbietblxprcs" path="res://scenes/enemy/enemy.tscn" id="1_i04ni"]
 [ext_resource type="Resource" uid="uid://qq1msqjakgco" path="res://resources/droptable/frequent_droptable.tres" id="2_6gj8e"]
-[ext_resource type="Script" uid="uid://dack7iip2h46r" path="res://scripts/npc/enemy_types/clockwise_type.gd" id="2_unk72"]
+[ext_resource type="Script" uid="uid://c7qd5ghy1unjm" path="res://scripts/npc/enemy_type.gd" id="2_unk72"]
 [ext_resource type="Script" uid="uid://dw56c8mjr07l7" path="res://scripts/resources/weights/wave_weight.gd" id="3_5cin1"]
 [ext_resource type="Script" uid="uid://beb5dv5tsjwdk" path="res://scripts/common/movement_pattern/sine_movement_pattern.gd" id="3_dtl65"]
 

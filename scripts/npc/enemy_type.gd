@@ -1,9 +1,9 @@
 @tool
-@abstract
 class_name EnemyType
 extends Node
 ## Component that decides an Enemy's type. Add exactly one as a child of an Enemy.
 ## It decides how the thread's winding counts, which way to wind and what colour the enemy is.
+## On its own, the enemy is wound Winds times in the Clockwise direction. Subclasses change the rule.
 ## Subclasses must be tool scripts too, so the enemy is drawn in the editor.
 
 ## Set per type in the enemy's scene, on its Type node.
@@ -57,7 +57,8 @@ func pick_movement_pattern(wave: int) -> void:
 
 ## How many winds the thread has made around the enemy in the direction it needs.
 ## [param windings] holds the thread's winding around every enemy in the arena.
-@abstract func wound_amount(windings: Dictionary[Enemy, float]) -> float
+func wound_amount(windings: Dictionary[Enemy, float]) -> float:
+	return windings.get(enemy, 0.0) * direction()
 
 
 func get_color() -> Color:
