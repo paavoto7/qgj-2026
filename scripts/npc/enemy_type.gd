@@ -1,17 +1,19 @@
 @tool
-@abstract
 class_name EnemyType
 extends Node
 ## Component that decides an Enemy's type. Add exactly one as a child of an Enemy.
 ## It decides how the thread's winding counts, which way to wind and what colour the enemy is.
+## On its own, the enemy is wound Winds times in its Wind Direction. Subclasses change the rule.
 ## Subclasses must be tool scripts too, so the enemy is drawn in the editor.
+
+enum WindDirection { CLOCKWISE, COUNTERCLOCKWISE, RANDOM }
 
 ## Set per type in the enemy's scene, on its Type node.
 @export var color: Color = Color.WHITE
 ## How many winds knot the enemy. Also the number of rings drawn around it.
 @export var winds: int = 1
-## Which way to wind. Flips the rings and arrow too.
-@export var clockwise: bool = true
+## Which way to wind. Random picks one when the enemy is created. Flips the rings and arrow too.
+@export var wind_direction: WindDirection = WindDirection.CLOCKWISE
 ## How likely the enemy is to just chase, compared to the weights of its MovementPattern children.
 ## Empty means a weight of 1 on every wave.
 @export var no_pattern_weight: WaveWeight = null
@@ -21,6 +23,9 @@ var movement_pattern: MovementPattern = null
 var enemy: Enemy:
 	get:
 		return get_parent() as Enemy
+
+## The direction used when Wind Direction is Random.
+var _random_direction: float = 1.0 if randf() < 0.5 else -1.0
 
 
 ## Returns the first EnemyType child of node, or null.
@@ -57,19 +62,12 @@ func pick_movement_pattern(wave: int) -> void:
 
 ## How many winds the thread has made around the enemy in the direction it needs.
 ## [param windings] holds the thread's winding around every enemy in the arena.
-@abstract func wound_amount(windings: Dictionary[Enemy, float]) -> float
+func wound_amount(windings: Dictionary[Enemy, float]) -> float:
+	return windings.get(enemy, 0.0) * direction()
 
 
 func get_color() -> Color:
 	return color
-
-
-func get_speed() -> float:
-	return enemy.speed
-
-
-func get_radius() -> float:
-	return enemy.radius
 
 
 func winds_needed() -> int:
@@ -78,7 +76,12 @@ func winds_needed() -> int:
 
 ## 1 for clockwise, -1 for counterclockwise.
 func direction() -> float:
-	return 1.0 if clockwise else -1.0
+	match wind_direction:
+		WindDirection.COUNTERCLOCKWISE:
+			return -1.0
+		WindDirection.RANDOM:
+			return _random_direction
+	return 1.0
 
 
 ## Adjusts the enemy's velocity, which chases the target by default.

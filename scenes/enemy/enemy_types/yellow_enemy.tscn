@@ -10,3 +10,4 @@ drop_table = ExtResource("2_wa2t4")
 [node name="Type" type="Node" parent="." index="0" unique_id=869984590]
 script = ExtResource("2_evuqt")
 color = Color(1, 0.8509804, 0.4, 1)
+wind_direction = 2

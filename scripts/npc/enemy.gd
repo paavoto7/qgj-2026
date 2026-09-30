@@ -28,6 +28,10 @@ var is_knotted: bool = false
 var color: Color:
 	get:
 		return type.get_color() if is_instance_valid(type) else Color.WHITE
+## How many winds the thread has completed around the enemy.
+var completed_winds: int:
+	get:
+		return _completed_winds
 
 var _progress: float = 0.0
 var _completed_winds: int = 0
@@ -52,8 +56,6 @@ func _ready() -> void:
 		set_physics_process(false)
 		return
 
-	speed = type.get_speed()
-	radius = type.get_radius()
 	type.pick_movement_pattern(wave)
 
 

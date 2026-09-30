@@ -10,3 +10,5 @@ drop_table = ExtResource("2_mp3xm")
 [node name="Type" type="Node" parent="." index="0" unique_id=869984590]
 script = ExtResource("2_slaty")
 color = Color(0.63245636, 0.40498087, 0.8557783, 1)
+winds = 3
+wind_direction = 2
