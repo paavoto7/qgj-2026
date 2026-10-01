@@ -5,9 +5,11 @@
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_b7fdj"]
 atlas = ExtResource("2_bkov2")
-region = Rect2(0, 0, 72, 72)
+region = Rect2(10, 12, 52, 51)
 
 [resource]
 script = ExtResource("1_6yylf")
+name = "Shield"
 sprite = SubResource("AtlasTexture_b7fdj")
+duration = 5.0
 metadata/_custom_type_script = "uid://dokv706aokv8v"

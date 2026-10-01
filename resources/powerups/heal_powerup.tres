@@ -5,9 +5,10 @@
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_a0mmh"]
 atlas = ExtResource("2_s8tip")
-region = Rect2(72, 0, 72, 72)
+region = Rect2(81, 9, 54, 54)
 
 [resource]
 script = ExtResource("1_8ncm3")
+name = "Heal"
 sprite = SubResource("AtlasTexture_a0mmh")
 metadata/_custom_type_script = "uid://cjld3v6rbqhe0"
