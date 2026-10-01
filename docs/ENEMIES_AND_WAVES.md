@@ -2,13 +2,13 @@
 How enemies are built and how to add new enemies and waves. Everything except a new enemy type is done in the editor, without code.
 
 ## How it fits together
-- **`Enemy`** (`scripts/npc/enemy.gd`) is the shared enemy: chasing the player, drawing the rings and arrow, checking the thread's winding and the knot animation. Its scene is `scenes/enemy/enemy.tscn`.
+- **`Enemy`** (`scripts/npc/enemy.gd`) is the shared enemy: chasing the player, drawing the rings and arrow, checking the thread's winding and the knot animation. Its scene is `scenes/enemy/enemy.tscn`. Winding only counts while the player is within *Wind Range* of the enemy, so laps around the whole arena don't wind anything. If a wind makes no progress for *Unwind Delay* seconds, the unfinished wind slides back at *Unwind Speed* winds per second. Completed winds stay done. All three are on the root `Enemy` node.
 - **`EnemyType`** (`scripts/npc/enemy_type.gd`) is a component, a child node of the `Enemy`, like a Unity component. It decides how the winding counts and which way to wind. Every enemy has exactly one. All types have *Color*, *Winds* (how many winds knot it, 1 by default) and *Wind Direction* (*Clockwise* by default, *Counterclockwise*, or *Random*, which picks one when the enemy is created), set on the `Type` node in each enemy scene. On its own, `EnemyType` is the plain rule, and most enemies use it directly. Subclasses in `scripts/npc/enemy_types/` change the rule:
 
   | Type | Rule |
   | --- | --- |
   | `EnemyType` | Wind *Winds* times in the *Wind Direction*. Set *Speed*, *Radius* and the `Attack` on the scene for the rest. |
-  | `PairedType` | Linked to a partner. Loop around both *Winds* times. The partner takes over the first enemy's direction. |
+  | `PairedType` | Linked to a partner. Loop around both *Winds* times, a loop through the gap or a figure eight doesn't count. The partner takes over the first enemy's direction. |
   | `PurpleType` | Wind *Winds* times, switching direction after each wind. *Wind Direction* is the first one. |
   | `YellowType` | When knotted, it splits into two smaller, faster copies that don't split again. |
 
@@ -44,10 +44,11 @@ When the rule itself is different, not just *Winds*, *Wind Direction*, *Speed*, 
 
    | Method | Default | Use it for |
    | --- | --- | --- |
-   | `wound_amount(windings) -> float` | winding in the `direction()` direction | How many winds the thread has made in the direction this enemy needs. `windings` has the winding around every enemy in the arena, positive = clockwise. The enemy is knotted once this reaches `winds_needed()`. |
+   | `winding_center() -> Vector2` | the enemy's position | The global point the player winds around, like the middle of a `PairedType` pair. |
+   | `min_wind_distance() -> float` | `0.0` | Movement closer than this to the centre doesn't count, like the gap between a pair. |
    | `get_color() -> Color` | *Color* | A colour that changes, e.g. with state. |
    | `winds_needed() -> int` | *Winds* | Number of rings, and winds needed to knot. |
-   | `direction() -> float` | *Wind Direction* as `1.0` / `-1.0` | `1.0` clockwise, `-1.0` counterclockwise. Flips the rings and arrow. Multiply by it in your own `wound_amount` so the rule follows *Wind Direction*. |
+   | `direction() -> float` | *Wind Direction* as `1.0` / `-1.0` | `1.0` clockwise, `-1.0` counterclockwise. Flips the rings and arrow. Can change over time, like `PurpleType` flipping after each wind. |
    | `steer(velocity) -> Vector2` | chase the player | Different movement. Return the new velocity. |
    | `on_spawned(group)` | nothing | Setup that needs the other enemies from the same scene, like `PairedType` linking up. |
    | `on_wind_completed()` | nothing | Something that happens after each full wind, like `PurpleType` switching direction. |

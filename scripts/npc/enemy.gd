@@ -3,6 +3,7 @@ class_name Enemy
 extends Node2D
 ## Enemy that dies when the thread winds around it in the right pattern.
 ## Its EnemyType child component decides the pattern. Positive winds are clockwise.
+## Only movement within Wind Range counts, and an unfinished wind slides back if it makes no progress for a while.
 ## A tool script so it's drawn in the editor. Gameplay code is skipped there.
 
 ## Emitted when this enemy creates a new one, e.g. by splitting. Whoever owns the enemies adds it to the scene.
@@ -20,6 +21,13 @@ const RING_SPACING: float = 5.0
 @export var attack: Attack = null
 ## What the enemy can drop when it's knotted. None means it drops nothing.
 @export var drop_table: DropTable = null
+## How close to the enemy's centre the player must be for its movement to wind the enemy.
+## Stops laps around the whole arena from winding every enemy inside them.
+@export var wind_range: float = 180.0
+## Seconds without winding progress before the unfinished wind starts sliding back.
+@export var unwind_delay: float = 1.0
+## Winds per second the unfinished wind slides back. Completed winds stay done.
+@export var unwind_speed: float = 0.5
 
 var target: Node2D
 ## The wave the enemy spawned on, set by the WaveSpawner. Used for wave-based weights.
@@ -32,14 +40,19 @@ var color: Color:
 var completed_winds: int:
 	get:
 		return _completed_winds
+## Total winding done in the needed direction: completed winds plus the current one, e.g. 2.4.
+var total_wound: float:
+	get:
+		return _completed_winds + _wind_progress
 
-var _progress: float = 0.0
+## Progress of the current, unfinished wind in the needed direction, from 0 to 1.
+var _wind_progress: float = 0.0
+## Finished winds. The enemy is knotted when this reaches the type's winds_needed().
 var _completed_winds: int = 0
-var _thread_completed_winds: int = 0
-var _winding_total: float = 0.0
-var _previous_position: Vector2
-var _previous_player_position: Vector2
-var _winding_initialized: bool = false
+## Seconds since the wind last made progress.
+var _idle_time: float = 0.0
+## The player's position relative to the winding centre on the previous frame. Zero until the first frame.
+var _previous_offset: Vector2 = Vector2.ZERO
 
 @onready var type: EnemyType = EnemyType.find_in(self)
 
@@ -85,11 +98,18 @@ func _draw() -> void:
 	var remaining_winds: int = maxi(winds - _completed_winds, 0)
 	var direction: float = type.direction()
 
+	# While a wind is in progress, show the range it counts in and dim the fill as it's about to slide back
+	var fill_color: Color = color
+	if _wind_progress > 0.0:
+		draw_arc(to_local(type.winding_center()), wind_range, 0.0, TAU, 64, Color(color, 0.12), 1.0)
+		var countdown: float = clampf(_idle_time / maxf(unwind_delay, 0.001), 0.0, 1.0)
+		fill_color = Color(color, lerpf(1.0, 0.35, countdown))
+
 	for i: int in remaining_winds:
 		var ring_radius: float = radius + 6.0 + i * RING_SPACING
 		draw_arc(Vector2.ZERO, ring_radius, 0.0, TAU, 32, Color(color, 0.25), 2.0)
 
-		var fill: float = clampf(_progress - i, 0.0, 1.0)
+		var fill: float = clampf(_wind_progress - i, 0.0, 1.0)
 		if fill > 0.0:
 			draw_arc(
 				Vector2.ZERO,
@@ -97,7 +117,7 @@ func _draw() -> void:
 				-PI / 2.0,
 				-PI / 2.0 + direction * fill * TAU,
 				48,
-				color,
+				fill_color,
 				3.0
 			)
 
@@ -132,38 +152,43 @@ static func take_from(node: Node) -> Array[Enemy]:
 	return enemies
 
 
-## Updates the progress rings and returns true when the thread knots this enemy.
-## [param windings] holds the winding around every enemy in the arena.
-func evaluate(windings: Dictionary[Enemy, float]) -> bool:
+## Advances the winding from the player's movement this frame. Returns true when the enemy is knotted.
+func update_winding(player_position: Vector2, delta: float) -> bool:
 	if not is_instance_valid(type):
 		return false
 
-	var along: float = type.wound_amount(windings)
-	var needed: int = type.winds_needed()
+	var offset: Vector2 = player_position - type.winding_center()
+	var distance: float = offset.length()
+	var step: float = 0.0
+	# Only movement within range counts, so laps around the arena don't wind every enemy inside them
+	var in_range: bool = distance <= wind_range and distance >= type.min_wind_distance()
+	if in_range and offset.length_squared() > 0.001 and _previous_offset.length_squared() > 0.001:
+		step = angle_difference(
+				_previous_offset.angle(),
+				offset.angle()
+			) / TAU * type.direction()
+	_previous_offset = offset
 
-	if along < 0.0:
-		_progress = 0.0
-		return false
+	# Winding the wrong way never goes below 0, so turning around counts straight away
+	_wind_progress = maxf(_wind_progress + step, 0.0)
+	_idle_time = 0.0 if step > 0.0 else _idle_time + delta
 
-	# The current, unfinished wind can be reversed.
-	if absf(along) <= TOLERANCE:
-		_thread_completed_winds = 0
-		_progress = 0.0
-		return false
+	# No progress for a while, so the unfinished wind slides back. Completed winds stay done.
+	if _idle_time > unwind_delay:
+		_wind_progress = maxf(_wind_progress - unwind_speed * delta, 0.0)
 
-	# Count only newly completed winds.
-	var completed_in_thread: int = floori(along + TOLERANCE)
-	var newly_completed: int = completed_in_thread - _thread_completed_winds
-
-	if newly_completed > 0:
-		_completed_winds += newly_completed
-		_thread_completed_winds = completed_in_thread
+	if _wind_progress >= 1.0 - TOLERANCE:
+		_wind_progress = 0.0
+		_completed_winds += 1
 		type.on_wind_completed()
 
-	# Progress only represents the currently unfinished wind.
-	_progress = maxf(along - completed_in_thread, 0.0)
+	return _completed_winds >= type.winds_needed()
 
-	return _completed_winds >= needed
+
+## Drops the current, unfinished wind. Completed winds stay done.
+func reset_winding() -> void:
+	_wind_progress = 0.0
+	_idle_time = 0.0
 
 
 func knot() -> void:
@@ -206,37 +231,3 @@ func _drop_item() -> void:
 
 	item.position = position
 	dropped.emit(item)
-
-func update_winding(player_position: Vector2) -> void:
-	var current_position: Vector2 = global_position
-
-	if not _winding_initialized:
-		_previous_player_position = player_position
-		_previous_position = current_position
-		_winding_initialized = true
-		return
-
-	var previous_relative: Vector2 = _previous_player_position - _previous_position
-	var current_relative: Vector2 = player_position - current_position
-
-	if previous_relative.length_squared() > 0.001 and current_relative.length_squared() > 0.001:
-		_winding_total += angle_difference(
-			previous_relative.angle(),
-			current_relative.angle()
-		) / TAU
-
-	# Winding the wrong way doesn't build up debt. Turning around counts straight away.
-	# The total is signed, so flip it to the needed direction, drop the wrong-way part and flip it back.
-	# TODO: store progress in the needed direction instead, so this and every type's `* direction()` go away.
-	if is_instance_valid(type):
-		var direction: float = type.direction()
-		_winding_total = maxf(_winding_total * direction, 0.0) * direction
-
-	_previous_player_position = player_position
-	_previous_position = current_position
-
-
-## Signed turns of the player around the enemy: positive is clockwise, negative counterclockwise.
-## Never goes past 0 the wrong way. The EnemyType turns it into progress with [method EnemyType.direction].
-func get_winding_total() -> float:
-	return _winding_total

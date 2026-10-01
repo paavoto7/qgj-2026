@@ -99,8 +99,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			return
 
 
-func _physics_process(_delta: float) -> void:
-	_check_knots()
+func _physics_process(delta: float) -> void:
+	_check_knots(delta)
 
 	if _spawner.enemies.is_empty():
 		_spawner.next_wave()
@@ -113,16 +113,11 @@ func _draw() -> void:
 	draw_rect(_arena, arena_data.border_color, false, 2.0)
 
 
-func _check_knots() -> void:
+func _check_knots(delta: float) -> void:
 	var enemies: Array[Enemy] = _spawner.enemies
-	var windings: Dictionary[Enemy, float] = {}
-	for enemy: Enemy in enemies:
-		enemy.update_winding(_player.global_position)
-		windings[enemy] = enemy.get_winding_total()
-
 	var knotted: Array[Enemy] = []
 	for enemy: Enemy in enemies:
-		if enemy.evaluate(windings):
+		if enemy.update_winding(_player.global_position, delta):
 			knotted.append(enemy)
 
 	if knotted.is_empty():
@@ -144,6 +139,8 @@ func _on_item_dropped(item: Node2D) -> void:
 func _on_player_damaged(_amount: int) -> void:
 	# The player snaps its thread on a hit, which also breaks the combo
 	_score_keeper.break_combo()
+	for enemy: Enemy in _spawner.enemies:
+		enemy.reset_winding()
 
 
 func _on_player_died() -> void:

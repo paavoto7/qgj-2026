@@ -1,7 +1,7 @@
 @tool
 class_name PairedType
 extends EnemyType
-## The enemy is linked to a partner. Both must be wound in the chosen direction.
+## The enemy is linked to a partner. Loop around both in the chosen direction.
 
 ## How far apart linked partners try to stay.
 const PAIR_DISTANCE: float = 110.0
@@ -19,16 +19,19 @@ func has_partner() -> bool:
 	return is_instance_valid(partner)
 
 
-func wound_amount(windings: Dictionary[Enemy, float]) -> float:
-	var winding: float = windings.get(enemy, 0.0) * direction()
+## The middle of the pair. Both partners measure from it, so they fill and knot together,
+## and a figure eight nets zero.
+func winding_center() -> Vector2:
 	if not has_partner():
-		return maxf(winding, 0.0)
+		return super.winding_center()
+	return (enemy.global_position + partner.enemy.global_position) / 2.0
 
-	# Both must be wound in the chosen direction, so a loop around the pair counts but a figure eight doesn't.
-	var partner_winding: float = windings.get(partner.enemy, 0.0) * direction()
-	if winding < 0.0 or partner_winding < 0.0:
-		return 0.0
-	return minf(winding, partner_winding)
+
+## Half the distance between the partners, so a loop through the gap between them doesn't count.
+func min_wind_distance() -> float:
+	if not has_partner():
+		return super.min_wind_distance()
+	return enemy.global_position.distance_to(partner.enemy.global_position) / 2.0
 
 
 ## Links with the other paired enemy spawned from the same scene. The partner takes over this enemy's direction.
