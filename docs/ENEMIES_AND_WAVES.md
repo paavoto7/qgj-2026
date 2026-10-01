@@ -2,7 +2,7 @@
 How enemies are built and how to add new enemies and waves. Everything except a new enemy type is done in the editor, without code.
 
 ## How it fits together
-- **`Enemy`** (`scripts/npc/enemy.gd`) is the shared enemy: chasing the player, drawing the rings and arrow, checking the thread's winding and the knot animation. Its scene is `scenes/enemy/enemy.tscn`.
+- **`Enemy`** (`scripts/npc/enemy.gd`) is the shared enemy: chasing the player, drawing the rings and arrow, checking the thread's winding and the knot animation. Its scene is `scenes/enemy/enemy.tscn`. Winding only counts while the player is within *Wind Range* of the enemy, so laps around the whole arena don't wind anything. If a wind makes no progress for *Unwind Delay* seconds, the unfinished wind slides back at *Unwind Speed* winds per second. Completed winds stay done. All three are on the root `Enemy` node.
 - **`EnemyType`** (`scripts/npc/enemy_type.gd`) is a component, a child node of the `Enemy`, like a Unity component. It decides how the winding counts and which way to wind. Every enemy has exactly one. All types have *Color*, *Winds* (how many winds knot it, 1 by default) and *Wind Direction* (*Clockwise* by default, *Counterclockwise*, or *Random*, which picks one when the enemy is created), set on the `Type` node in each enemy scene. On its own, `EnemyType` is the plain rule, and most enemies use it directly. Subclasses in `scripts/npc/enemy_types/` change the rule:
 
   | Type | Rule |

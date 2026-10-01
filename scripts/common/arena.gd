@@ -99,8 +99,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			return
 
 
-func _physics_process(_delta: float) -> void:
-	_check_knots()
+func _physics_process(delta: float) -> void:
+	_check_knots(delta)
 
 	if _spawner.enemies.is_empty():
 		_spawner.next_wave()
@@ -113,11 +113,11 @@ func _draw() -> void:
 	draw_rect(_arena, arena_data.border_color, false, 2.0)
 
 
-func _check_knots() -> void:
+func _check_knots(delta: float) -> void:
 	var enemies: Array[Enemy] = _spawner.enemies
 	var windings: Dictionary[Enemy, float] = {}
 	for enemy: Enemy in enemies:
-		enemy.update_winding(_player.global_position)
+		enemy.update_winding(_player.global_position, delta)
 		windings[enemy] = enemy.get_winding_total()
 
 	var knotted: Array[Enemy] = []

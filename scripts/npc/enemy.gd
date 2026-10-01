@@ -3,6 +3,7 @@ class_name Enemy
 extends Node2D
 ## Enemy that dies when the thread winds around it in the right pattern.
 ## Its EnemyType child component decides the pattern. Positive winds are clockwise.
+## Only movement within Wind Range counts, and an unfinished wind slides back if it makes no progress for a while.
 ## A tool script so it's drawn in the editor. Gameplay code is skipped there.
 
 ## Emitted when this enemy creates a new one, e.g. by splitting. Whoever owns the enemies adds it to the scene.
@@ -20,6 +21,13 @@ const RING_SPACING: float = 5.0
 @export var attack: Attack = null
 ## What the enemy can drop when it's knotted. None means it drops nothing.
 @export var drop_table: DropTable = null
+## How close to the enemy's centre the player must be for its movement to wind the enemy.
+## Stops laps around the whole arena from winding every enemy inside them.
+@export var wind_range: float = 180.0
+## Seconds without winding progress before the unfinished wind starts sliding back.
+@export var unwind_delay: float = 1.0
+## Winds per second the unfinished wind slides back. Completed winds stay done.
+@export var unwind_speed: float = 0.5
 
 var target: Node2D
 ## The wave the enemy spawned on, set by the WaveSpawner. Used for wave-based weights.
@@ -40,6 +48,8 @@ var _winding_total: float = 0.0
 var _previous_position: Vector2
 var _previous_player_position: Vector2
 var _winding_initialized: bool = false
+## Seconds since the winding last grew in the needed direction.
+var _idle_time: float = 0.0
 
 @onready var type: EnemyType = EnemyType.find_in(self)
 
@@ -85,6 +95,13 @@ func _draw() -> void:
 	var remaining_winds: int = maxi(winds - _completed_winds, 0)
 	var direction: float = type.direction()
 
+	# While a wind is in progress, show the range it counts in and dim the fill as it's about to slide back
+	var fill_color: Color = color
+	if _progress > 0.0:
+		draw_arc(Vector2.ZERO, wind_range, 0.0, TAU, 64, Color(color, 0.12), 1.0)
+		var countdown: float = clampf(_idle_time / maxf(unwind_delay, 0.001), 0.0, 1.0)
+		fill_color = Color(color, lerpf(1.0, 0.35, countdown))
+
 	for i: int in remaining_winds:
 		var ring_radius: float = radius + 6.0 + i * RING_SPACING
 		draw_arc(Vector2.ZERO, ring_radius, 0.0, TAU, 32, Color(color, 0.25), 2.0)
@@ -97,7 +114,7 @@ func _draw() -> void:
 				-PI / 2.0,
 				-PI / 2.0 + direction * fill * TAU,
 				48,
-				color,
+				fill_color,
 				3.0
 			)
 
@@ -207,7 +224,7 @@ func _drop_item() -> void:
 	item.position = position
 	dropped.emit(item)
 
-func update_winding(player_position: Vector2) -> void:
+func update_winding(player_position: Vector2, delta: float) -> void:
 	var current_position: Vector2 = global_position
 
 	if not _winding_initialized:
@@ -218,22 +235,39 @@ func update_winding(player_position: Vector2) -> void:
 
 	var previous_relative: Vector2 = _previous_player_position - _previous_position
 	var current_relative: Vector2 = player_position - current_position
+	var previous_total: float = _winding_total
 
-	if previous_relative.length_squared() > 0.001 and current_relative.length_squared() > 0.001:
+	# Out of range the movement doesn't count, but the positions are still stored so re-entering doesn't jump
+	var in_range: bool = current_relative.length() <= wind_range
+	if in_range and previous_relative.length_squared() > 0.001 and current_relative.length_squared() > 0.001:
 		_winding_total += angle_difference(
 			previous_relative.angle(),
 			current_relative.angle()
 		) / TAU
 
+	_previous_player_position = player_position
+	_previous_position = current_position
+
+	if not is_instance_valid(type):
+		return
+
 	# Winding the wrong way doesn't build up debt. Turning around counts straight away.
 	# The total is signed, so flip it to the needed direction, drop the wrong-way part and flip it back.
 	# TODO: store progress in the needed direction instead, so this and every type's `* direction()` go away.
-	if is_instance_valid(type):
-		var direction: float = type.direction()
-		_winding_total = maxf(_winding_total * direction, 0.0) * direction
+	var direction: float = type.direction()
+	var along: float = maxf(_winding_total * direction, 0.0)
 
-	_previous_player_position = player_position
-	_previous_position = current_position
+	if along > previous_total * direction:
+		_idle_time = 0.0
+	else:
+		_idle_time += delta
+
+	# No progress for a while, so the unfinished wind slides back. Completed winds stay done.
+	if _idle_time > unwind_delay:
+		var floor_amount: float = minf(along, _thread_completed_winds)
+		along = maxf(along - unwind_speed * delta, floor_amount)
+
+	_winding_total = along * direction
 
 
 ## Signed turns of the player around the enemy: positive is clockwise, negative counterclockwise.
