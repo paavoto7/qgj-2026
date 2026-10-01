@@ -2,7 +2,7 @@
 class_name EnemyType
 extends Node
 ## Component that decides an Enemy's type. Add exactly one as a child of an Enemy.
-## It decides how the thread's winding counts, which way to wind and what colour the enemy is.
+## It decides where the winding is measured, which way to wind and what colour the enemy is.
 ## On its own, the enemy is wound Winds times in its Wind Direction. Subclasses change the rule.
 ## Subclasses must be tool scripts too, so the enemy is drawn in the editor.
 
@@ -60,10 +60,14 @@ func pick_movement_pattern(wave: int) -> void:
 			pattern.queue_free()
 
 
-## How many winds the thread has made around the enemy in the direction it needs.
-## [param windings] holds the thread's winding around every enemy in the arena.
-func wound_amount(windings: Dictionary[Enemy, float]) -> float:
-	return windings.get(enemy, 0.0) * direction()
+## The point, in global coordinates, that the player winds around.
+func winding_center() -> Vector2:
+	return enemy.global_position
+
+
+## Movement closer than this to the winding centre doesn't count.
+func min_wind_distance() -> float:
+	return 0.0
 
 
 func get_color() -> Color:
