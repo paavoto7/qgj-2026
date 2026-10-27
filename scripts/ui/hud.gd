@@ -2,6 +2,9 @@ class_name HUD
 extends Control
 ## In-game HUD with the wave, score, combo countdown and player HP, plus the pause menu and game over screen.
 ## The arena calls setup() and the show_* methods; the HUD doesn't look anything up itself.
+## On mobile it adds a pause button, since there's no pause key.
+
+const PAUSE_BUTTON_SIZE: Vector2 = Vector2(64.0, 64.0)
 
 var _wave: WaveData
 var _wave_number: int = 0
@@ -20,6 +23,17 @@ var _arena_size: Vector2
 @onready var _pause_menu: PauseMenu = $PauseMenu
 
 @onready var _viewport: Viewport = get_viewport()
+
+
+func _ready() -> void:
+	# Touches on the HUD have to pass through to the player, which steers with them
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_combo_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	# Phones have no pause key
+	if MainManager.is_mobile:
+		_add_pause_button()
+
 
 func _process(delta: float) -> void:
 	if _combo == 0:
@@ -76,6 +90,22 @@ func show_game_over(score: int, is_new_high_score: bool) -> void:
 	# No pausing over the game over screen
 	_pause_menu.can_pause = false
 	_game_over_screen.show_results(score, is_new_high_score)
+
+
+func _add_pause_button() -> void:
+	var button := Button.new()
+	button.text = "II"
+	button.focus_mode = Control.FOCUS_NONE
+	button.custom_minimum_size = PAUSE_BUTTON_SIZE
+	button.add_theme_font_size_override("font_size", 32)
+	button.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT, Control.PRESET_MODE_MINSIZE, 16)
+	button.pressed.connect(_on_pause_pressed)
+	add_child(button)
+
+
+func _on_pause_pressed() -> void:
+	if _pause_menu.can_pause:
+		_pause_menu.pause()
 
 
 func _on_player_health_changed(current: int, _maximum: int) -> void:

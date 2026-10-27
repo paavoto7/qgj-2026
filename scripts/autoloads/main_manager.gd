@@ -7,6 +7,8 @@ signal scene_changing(path: String)
 const SAVE_PATH: String = "user://game_data.tres"
 
 var game_data: GameData
+## Running on a phone or tablet, natively or in a mobile browser.
+var is_mobile: bool = false
 
 var is_paused: bool:
 	get:
@@ -17,6 +19,8 @@ func _enter_tree() -> void:
 	# Pause and quit handling must work while the tree is paused
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	load_game_data()
+
+	is_mobile = OS.has_feature("web_android") or OS.has_feature("web_ios") or OS.has_feature("mobile")
 
 
 func _notification(what: int) -> void:
